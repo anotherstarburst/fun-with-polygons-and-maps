@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
-import { FeatureCollection } from './types';
+import { FeatureCollection } from '../types';
 
 
 interface SolutionContextType {

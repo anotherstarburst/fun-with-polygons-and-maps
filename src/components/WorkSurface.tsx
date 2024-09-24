@@ -1,8 +1,8 @@
-import { Polygon } from './polygon';
+import { Polygon } from './Polygon';
 import { useSolutionContext } from './SolutionContext';
 
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
-import { FeatureCollection } from './types';
+import { FeatureCollection } from '../types';
 import { useMemo } from 'react';
 
 
