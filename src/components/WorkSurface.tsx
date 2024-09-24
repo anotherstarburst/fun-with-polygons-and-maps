@@ -4,6 +4,7 @@ import { useSolutionContext } from './SolutionContext';
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import { FeatureCollection } from '../types';
 import { useMemo } from 'react';
+import { polygonColorOptions } from './utils';
 
 function getPolygons(payload: FeatureCollection) {
   return payload.features.map((feature) => {
@@ -14,19 +15,9 @@ function getPolygons(payload: FeatureCollection) {
   });
 }
 
-const polygonColorOptions = [
-  'red',
-  'green',
-  'blue',
-  'yellow',
-  'magenta',
-  'orange',
-  'purple',
-  'cyan',
-];
-
 function WorkSurface() {
-  const { payload } = useSolutionContext();
+  const { payload, setSelectedPolygons, selectedPolygons } =
+    useSolutionContext();
   const paths = useMemo(() => getPolygons(payload), [payload]);
   const defaultCenter = useMemo(() => {
     return paths[0][0];
@@ -35,7 +26,7 @@ function WorkSurface() {
   return (
     <APIProvider apiKey={''}>
       <Map
-        defaultZoom={15}
+        defaultZoom={16}
         defaultCenter={defaultCenter}
         mapId="DEMO_MAP_ID"
         className="vh-100"
@@ -48,6 +39,13 @@ function WorkSurface() {
             fillColor={polygonColorOptions[index]}
             onClick={() => {
               console.log(`Polygon ${index} clicked`);
+              if (selectedPolygons.includes(index)) {
+                setSelectedPolygons((prevState) =>
+                  prevState.filter((polygonIndex) => polygonIndex !== index)
+                );
+                return;
+              }
+              setSelectedPolygons([...selectedPolygons, index]);
             }}
           />
         ))}

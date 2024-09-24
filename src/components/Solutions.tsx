@@ -18,8 +18,8 @@ const Solutions: React.FC = () => {
             type="radio"
             name="listGroupRadio"
             id="firstRadio"
-            checked={selectedSolution === 1}
-            onChange={() => handleSolutionChange(1)}
+            checked={selectedSolution === 0}
+            onChange={() => handleSolutionChange(0)}
           />
           <label className="form-check-label" htmlFor="firstRadio">
             Solution 1
@@ -31,8 +31,8 @@ const Solutions: React.FC = () => {
             type="radio"
             name="listGroupRadio"
             id="secondRadio"
-            checked={selectedSolution === 2}
-            onChange={() => handleSolutionChange(2)}
+            checked={selectedSolution === 1}
+            onChange={() => handleSolutionChange(1)}
           />
           <label className="form-check-label" htmlFor="secondRadio">
             Solution 2

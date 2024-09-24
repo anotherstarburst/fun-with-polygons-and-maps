@@ -2,9 +2,12 @@ import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 import { FeatureCollection } from '../types';
 
 interface SolutionContextType {
+  selectedPolygons: number[];
+  setSelectedPolygons: Dispatch<SetStateAction<number[]>>;
   selectedSolution: number;
   setSelectedSolution: Dispatch<SetStateAction<number>>;
   payload: FeatureCollection;
+  apiResponse: FeatureCollection[];
 }
 
 export const SolutionContext = createContext<SolutionContextType | undefined>(
