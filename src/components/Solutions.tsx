@@ -1,7 +1,13 @@
+import React from 'react';
 import { useSolutionContext } from './SolutionContext';
 
-function Solutions() {
+const Solutions: React.FC = () => {
   const { selectedSolution, setSelectedSolution } = useSolutionContext();
+
+  const handleSolutionChange = (solutionIndex: number) => {
+    setSelectedSolution(solutionIndex);
+  };
+
   return (
     <>
       <h3>Solutions</h3>
@@ -13,7 +19,7 @@ function Solutions() {
             name="listGroupRadio"
             id="firstRadio"
             checked={selectedSolution === 1}
-            onClick={() => setSelectedSolution(1)}
+            onChange={() => handleSolutionChange(1)}
           />
           <label className="form-check-label" htmlFor="firstRadio">
             Solution 1
@@ -26,7 +32,7 @@ function Solutions() {
             name="listGroupRadio"
             id="secondRadio"
             checked={selectedSolution === 2}
-            onClick={() => setSelectedSolution(2)}
+            onChange={() => handleSolutionChange(2)}
           />
           <label className="form-check-label" htmlFor="secondRadio">
             Solution 2
@@ -35,6 +41,6 @@ function Solutions() {
       </ul>
     </>
   );
-}
+};
 
 export default Solutions;
