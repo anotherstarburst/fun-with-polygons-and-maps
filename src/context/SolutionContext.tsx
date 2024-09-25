@@ -1,9 +1,33 @@
-import { ReactNode, useMemo, useState, useEffect, useCallback } from 'react';
+import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 import { FeatureCollection } from '../types';
-import { SolutionContext } from './SolutionContext';
+import { ReactNode, useMemo, useState, useEffect, useCallback } from 'react';
 
 import responseOne from '../data/SE_State_Management_Polygons_1.json';
 import responseTwo from '../data/SE_State_Management_Polygons_2.json';
+
+interface SolutionContextType {
+  selectedPolygonIndexes: number[];
+  setSelectedPolygonIndexes: Dispatch<SetStateAction<number[]>>;
+  selectedSolutionIndex: number;
+  setSelectedSolutionIndex: Dispatch<SetStateAction<number>>;
+  activeSolution: FeatureCollection;
+  solutions: FeatureCollection[];
+  setSolutions: (newSolutions: FeatureCollection[]) => void;
+}
+
+export const SolutionContext = createContext<SolutionContextType | undefined>(
+  undefined
+);
+
+export function useSolutionContext() {
+  const context = useContext(SolutionContext);
+  if (!context) {
+    throw new Error(
+      'useSolutionContext must be used within a SolutionProvider'
+    );
+  }
+  return context;
+}
 
 interface SolutionProviderProps {
   children: ReactNode;
