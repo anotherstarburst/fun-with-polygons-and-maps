@@ -8,12 +8,9 @@ const Solutions: React.FC = () => {
   const {
     selectedSolutionIndex,
     setSelectedSolutionIndex,
-    setSelectedPolygonIndexes,
   } = useSolutionContext();
 
   const handleSolutionChange = (solutionIndex: number) => {
-    // Clear the selected polygon indexes to avoid race conditions.
-    setSelectedPolygonIndexes([]);
     setSelectedSolutionIndex(solutionIndex);
   };
 

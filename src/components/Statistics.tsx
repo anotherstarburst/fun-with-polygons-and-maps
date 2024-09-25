@@ -1,7 +1,7 @@
 import { useSolutionContext } from '../context/SolutionContext';
 import { useCallback, useMemo } from 'react';
 import { polygonColorOptions } from './constants';
-import { Geometry } from '../types';
+import { FeatureCollection, Geometry } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRuler, faSquare } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,7 +18,7 @@ function Statistics() {
     activeSolution,
     selectedSolutionIndex,
     setSolutions,
-    setSelectedPolygonIndexes,
+    solutions,
   } = useSolutionContext();
 
   const calculateArea = useCallback((polygon: Geometry) => {
@@ -222,7 +222,7 @@ function Statistics() {
               className="btn btn-outline-light w-100 mb-2"
               onClick={() => {
                 const union = turf.union(turf.featureCollection(turfPolygons));
-                updatePolygonsArray(union);
+                updatePolygonsArray(union, solutions);
               }}
             >
               <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
@@ -236,7 +236,7 @@ function Statistics() {
                   turf.featureCollection(turfPolygons)
                 );
 
-                updatePolygonsArray(intersection);
+                updatePolygonsArray(intersection, solutions);
               }}
             >
               <IntersectionAreaIcon
@@ -251,54 +251,52 @@ function Statistics() {
   );
 
   function updatePolygonsArray(
-    newPolygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | null
+    newPolygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | null,
+    solutions: FeatureCollection[]
   ) {
     const selectedPolygonIndexesClone = [...selectedPolygonIndexes];
-    setSelectedPolygonIndexes([]);
 
-    setSolutions((prevSolutions) => {
-      if (!newPolygon) {
-        console.error('No polygon');
-        return prevSolutions;
-      }
+    if (!newPolygon) {
+      console.error('No polygon');
+      return solutions;
+    }
 
-      const newSolutions = [...prevSolutions];
-      const newFeatures = [...newSolutions[selectedSolutionIndex].features];
+    const newSolutions = [...solutions];
+    const newFeatures = [...newSolutions[selectedSolutionIndex].features];
 
-      // Remove the original polygons
-      const updatedFeatures = newFeatures.filter(
-        (_, index) => !selectedPolygonIndexesClone.includes(index)
-      );
+    // Remove the original polygons
+    const updatedFeatures = newFeatures.filter(
+      (_, index) => !selectedPolygonIndexesClone.includes(index)
+    );
 
-      // Function to add a single polygon feature
-      const addPolygonFeature = (polygonGeometry: Polygon) => {
-        updatedFeatures.push({
-          type: 'Feature',
-          properties: {},
-          geometry: polygonGeometry,
+    // Function to add a single polygon feature
+    const addPolygonFeature = (polygonGeometry: Polygon) => {
+      updatedFeatures.push({
+        type: 'Feature',
+        properties: {},
+        geometry: polygonGeometry,
+      });
+    };
+
+    // Handle Polygon or MultiPolygon
+    if (newPolygon.geometry.type === 'Polygon') {
+      addPolygonFeature(newPolygon.geometry);
+    } else {
+      // MultiPolygon
+      newPolygon.geometry.coordinates.forEach((polygonCoords) => {
+        addPolygonFeature({
+          type: 'Polygon',
+          coordinates: polygonCoords,
         });
-      };
+      });
+    }
 
-      // Handle Polygon or MultiPolygon
-      if (newPolygon.geometry.type === 'Polygon') {
-        addPolygonFeature(newPolygon.geometry);
-      } else {
-        // MultiPolygon
-        newPolygon.geometry.coordinates.forEach((polygonCoords) => {
-          addPolygonFeature({
-            type: 'Polygon',
-            coordinates: polygonCoords,
-          });
-        });
-      }
+    newSolutions[selectedSolutionIndex] = {
+      ...newSolutions[selectedSolutionIndex],
+      features: updatedFeatures,
+    };
 
-      newSolutions[selectedSolutionIndex] = {
-        ...newSolutions[selectedSolutionIndex],
-        features: updatedFeatures,
-      };
-
-      return newSolutions;
-    });
+    setSolutions(newSolutions);
   }
 }
 

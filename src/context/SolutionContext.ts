@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 import { FeatureCollection } from '../types';
 
-
 interface SolutionContextType {
   selectedPolygonIndexes: number[];
   setSelectedPolygonIndexes: Dispatch<SetStateAction<number[]>>;
@@ -9,7 +8,7 @@ interface SolutionContextType {
   setSelectedSolutionIndex: Dispatch<SetStateAction<number>>;
   activeSolution: FeatureCollection;
   solutions: FeatureCollection[];
-  setSolutions: Dispatch<SetStateAction<FeatureCollection[]>>;
+  setSolutions: (newSolutions: FeatureCollection[]) => void;
 }
 
 export const SolutionContext = createContext<SolutionContextType | undefined>(
@@ -25,5 +24,3 @@ export function useSolutionContext() {
   }
   return context;
 }
-
-
