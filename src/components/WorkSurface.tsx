@@ -9,8 +9,8 @@ import { MAX_SELECTED_POLYGONS } from './constants';
 
 const SELECTED_POLYGON_COLOUR = '#fff';
 
-function getPolygons(payload: FeatureCollection) {
-  return payload.features.map((feature) => {
+function getPolygons(activeSolution: FeatureCollection) {
+  return activeSolution.features.map((feature) => {
     return feature.geometry.coordinates[0].map((coord) => ({
       lat: coord[1],
       lng: coord[0],
@@ -19,10 +19,10 @@ function getPolygons(payload: FeatureCollection) {
 }
 
 function WorkSurface() {
-  const { payload, setSelectedPolygons, selectedPolygons } =
+  const { activeSolution, setSelectedPolygonIndexes, selectedPolygonIndexes } =
     useSolutionContext();
 
-  const paths = useMemo(() => getPolygons(payload), [payload]);
+  const paths = useMemo(() => getPolygons(activeSolution), [activeSolution]);
 
   const defaultCenter = useMemo(() => {
     return paths[0][0];
@@ -41,14 +41,14 @@ function WorkSurface() {
             key={index}
             paths={[path]}
             strokeColor={
-              selectedPolygons.includes(index)
+              selectedPolygonIndexes.includes(index)
                 ? SELECTED_POLYGON_COLOUR
                 : 'transparent'
             }
             fillColor={polygonColorOptions[index]}
             onClick={() => {
-              if (selectedPolygons.includes(index)) {
-                setSelectedPolygons((prevState) =>
+              if (selectedPolygonIndexes.includes(index)) {
+                setSelectedPolygonIndexes((prevState) =>
                   prevState.filter((polygonIndex) => polygonIndex !== index)
                 );
                 return;
@@ -56,14 +56,14 @@ function WorkSurface() {
 
               // if there are more than MAX_SELECTED_POLYGONS remove the first one
               // so that we can add the new one
-              let currentPolygons = [...selectedPolygons];
+              let currentPolygons = [...selectedPolygonIndexes];
               if (currentPolygons.length >= MAX_SELECTED_POLYGONS) {
                 currentPolygons = [...currentPolygons.slice(1), index];
-                setSelectedPolygons([...currentPolygons]);
+                setSelectedPolygonIndexes([...currentPolygons]);
                 return;
               }
 
-              setSelectedPolygons([...currentPolygons, index]);
+              setSelectedPolygonIndexes([...currentPolygons, index]);
             }}
           />
         ))}

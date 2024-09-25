@@ -8,7 +8,7 @@ import styles from './Statistics.module.scss';
 import * as turf from '@turf/turf';
 
 function Statistics() {
-  const { selectedPolygons, apiResponse, selectedSolution } =
+  const { selectedPolygonIndexes, solutions, selectedSolutionIndex, setSolutions } =
     useSolutionContext();
 
   const computedArea = useCallback((polygon: Geometry) => {
@@ -19,71 +19,61 @@ function Statistics() {
   const stackedArea = useMemo(() => {
     let area = 0;
     // Adds the areas of all selected polygons together.
-    for (const index of selectedPolygons) {
+    for (const index of selectedPolygonIndexes) {
       area += computedArea(
-        apiResponse[selectedSolution].features[index].geometry
+        solutions[selectedSolutionIndex].features[index].geometry
       );
     }
     return area;
-  }, [apiResponse, computedArea, selectedPolygons, selectedSolution]);
+  }, [solutions, computedArea, selectedPolygonIndexes, selectedSolutionIndex]);
+
+  const turfPolygons = useMemo(() => {
+    const polygons = [];
+    for (const index of selectedPolygonIndexes) {
+      const feature = solutions[selectedSolutionIndex];
+      const coordinates = feature?.features[index].geometry.coordinates;
+      polygons.push(
+        turf.polygon(coordinates, { fill: polygonColorOptions[index] })
+      );
+    }
+    return polygons;
+  }, [selectedPolygonIndexes, selectedSolutionIndex, solutions]);
 
   const arePolygonsOverlapping = useMemo(() => {
     // Impossible to have overlapping polygons if there is only one polygon
-    if (selectedPolygons.length < 2) return false;
+    if (turfPolygons.length < 2) return false;
 
-    if (selectedPolygons.length > 2)
+    if (turfPolygons.length > 2)
       throw new Error('Too many polygons selected');
 
-    const polys = [];
-    for (const index of selectedPolygons) {
-      const feature = apiResponse[selectedSolution];
-      polys.push(turf.polygon(feature?.features[index].geometry.coordinates));
-    }
+    return turf.booleanOverlap(turfPolygons[0], turfPolygons[1]);
+  }, [turfPolygons]);
 
-    return turf.booleanOverlap(polys[0], polys[1]);
-  }, [apiResponse, selectedPolygons, selectedSolution]);
+
 
   const unionArea = useMemo(() => {
     // Only calculated if there are two or more selected polygons and all overlap
     if (!arePolygonsOverlapping) return NaN;
 
-    const polygons = [];
-    for (const index of selectedPolygons) {
-      const feature = apiResponse[selectedSolution];
-      const coordinates = feature?.features[index].geometry.coordinates;
-      polygons.push(
-        turf.polygon(coordinates, { fill: polygonColorOptions[index] })
-      );
-    }
-
-    const union = turf.union(turf.featureCollection(polygons));
+    const union = turf.union(turf.featureCollection(turfPolygons));
 
     if (!union) return NaN;
 
     return turf.area(union);
-  }, [apiResponse, arePolygonsOverlapping, selectedPolygons, selectedSolution]);
+  }, [arePolygonsOverlapping, turfPolygons]);
 
   const intersectionArea = useMemo(() => {
     // Only calculated if there are two or more selected polygons and all overlap
     if (!arePolygonsOverlapping) return NaN;
 
-    const polygons = [];
-    for (const index of selectedPolygons) {
-      const feature = apiResponse[selectedSolution];
-      const coordinates = feature?.features[index].geometry.coordinates;
-      polygons.push(
-        turf.polygon(coordinates, { fill: polygonColorOptions[index] })
-      );
-    }
-
-    const intersection = turf.intersect(turf.featureCollection(polygons));
+    const intersection = turf.intersect(turf.featureCollection(turfPolygons));
 
     if (!intersection) return NaN;
 
     return turf.area(intersection);
-  }, [apiResponse, arePolygonsOverlapping, selectedPolygons, selectedSolution]);
+  }, [arePolygonsOverlapping, turfPolygons]);
 
-  if (!selectedPolygons.length)
+  if (!selectedPolygonIndexes.length)
     return (
       <div className="d-flex flex-column h-100 justify-content-center align-items-center">
         <p>Please select a polygon to start.</p>
@@ -96,11 +86,17 @@ function Statistics() {
       <div>
         {arePolygonsOverlapping && (
           <div className="mt-1">
-            <button className="btn btn-outline-light w-100 mb-1">
+            <button className="btn btn-outline-light w-100 mb-1"
+              onClick={() => {
+                // this will collect the selected polygons and figure out their union polygon. It will then
+                // create a new solutions array, replacing the old one with the new one and call setSolutions
+                // to update the map.
+              }}
+            >
               <div
-                className={`${styles['custom-icon-stack']} ${styles[`total-icons-${selectedPolygons.length}`]}`}
+                className={`${styles['custom-icon-stack']} ${styles[`total-icons-${selectedPolygonIndexes.length}`]}`}
               >
-                {selectedPolygons.map((value, index) => (
+                {selectedPolygonIndexes.map((value, index) => (
                   <span key={index} className={`${styles['fa-stack']}`}>
                     <FontAwesomeIcon
                       icon={faSquare}
@@ -112,7 +108,15 @@ function Statistics() {
               </div>
               Union
             </button>
-            <button className="btn btn-outline-light w-100">
+            <button className="btn btn-outline-light w-100"
+              onClick={() => {
+                // this will collect the selected polygons and figure out their intersection polygon. It will then
+                // create a new solutions array, replacing the old one with the new one and call setSolutions
+                // to update the map.
+                const intersection = turf.intersect(turf.featureCollection(turfPolygons));
+
+              }}
+            >
               <FontAwesomeIcon icon={faPizzaSlice} className="me-1" />
               Intersection
             </button>
@@ -120,11 +124,11 @@ function Statistics() {
         )}
       </div>
 
-      {selectedPolygons.length > 0 && (
+      {selectedPolygonIndexes.length > 0 && (
         <div>
           <p className="text-secondary fs-6">Selected Area</p>
           <ul className="fa-ul ms-4 text-end font-monospace">
-            {selectedPolygons.map((value) => {
+            {selectedPolygonIndexes.map((value) => {
               return (
                 <li>
                   <span className="fa-li">
@@ -136,11 +140,11 @@ function Statistics() {
                     />
                   </span>
                   <span
-                    title={`${computedArea(apiResponse[selectedSolution].features[value].geometry)}`}
+                    title={`${computedArea(solutions[selectedSolutionIndex].features[value].geometry)}`}
                   >
                     {Math.floor(
                       computedArea(
-                        apiResponse[selectedSolution].features[value].geometry
+                        solutions[selectedSolutionIndex].features[value].geometry
                       )
                     ).toLocaleString()}{' '}
                     m<sup>2</sup>
@@ -148,11 +152,11 @@ function Statistics() {
                 </li>
               );
             })}
-            {selectedPolygons.length > 1 && (
+            {selectedPolygonIndexes.length > 1 && (
               <>
                 <li>
                   <span className="fa-li">
-                    {selectedPolygons.map((value) => (
+                    {selectedPolygonIndexes.map((value) => (
                       <FontAwesomeIcon
                         icon={faSquare}
                         style={{
@@ -172,9 +176,9 @@ function Statistics() {
                 <li>
                   <span className="fa-li">
                     <div
-                      className={`${styles['custom-icon-stack']} ${styles[`total-icons-${selectedPolygons.length}`]}`}
+                      className={`${styles['custom-icon-stack']} ${styles[`total-icons-${selectedPolygonIndexes.length}`]}`}
                     >
-                      {selectedPolygons.map((value, index) => (
+                      {selectedPolygonIndexes.map((value, index) => (
                         <span key={index} className={`${styles['fa-stack']}`}>
                           <FontAwesomeIcon
                             icon={faSquare}

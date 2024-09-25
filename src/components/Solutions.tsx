@@ -2,10 +2,10 @@ import React from 'react';
 import { useSolutionContext } from './SolutionContext';
 
 const Solutions: React.FC = () => {
-  const { selectedSolution, setSelectedSolution } = useSolutionContext();
+  const { selectedSolutionIndex, setSelectedSolutionIndex } = useSolutionContext();
 
   const handleSolutionChange = (solutionIndex: number) => {
-    setSelectedSolution(solutionIndex);
+    setSelectedSolutionIndex(solutionIndex);
   };
 
   return (
@@ -18,7 +18,7 @@ const Solutions: React.FC = () => {
             type="radio"
             name="listGroupRadio"
             id="firstRadio"
-            checked={selectedSolution === 0}
+            checked={selectedSolutionIndex === 0}
             onChange={() => handleSolutionChange(0)}
           />
           <label className="form-check-label" htmlFor="firstRadio">
@@ -31,7 +31,7 @@ const Solutions: React.FC = () => {
             type="radio"
             name="listGroupRadio"
             id="secondRadio"
-            checked={selectedSolution === 1}
+            checked={selectedSolutionIndex === 1}
             onChange={() => handleSolutionChange(1)}
           />
           <label className="form-check-label" htmlFor="secondRadio">

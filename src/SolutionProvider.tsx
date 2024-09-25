@@ -10,31 +10,41 @@ interface SolutionProviderProps {
 }
 
 export function SolutionProvider({ children }: SolutionProviderProps) {
-  const [selectedSolution, setSelectedSolution] = useState<number>(0);
-  const [selectedPolygons, setSelectedPolygons] = useState<number[]>([]);
-
   const apiResponse = useMemo(() => {
     return [responseOne, responseTwo] as FeatureCollection[];
   }, []);
 
-  const payload = useMemo(() => {
-    return apiResponse[selectedSolution];
-  }, [apiResponse, selectedSolution]);
+  const [selectedSolutionIndex, setSelectedSolutionIndex] = useState<number>(0);
+  const [selectedPolygonIndexes, setSelectedPolygonIndexes] = useState<number[]>([]);
+  const [solutions, setSolutions] = useState<FeatureCollection[]>(apiResponse);
+
+  const activeSolution = useMemo(() => {
+    return solutions[selectedSolutionIndex];
+  }, [solutions, selectedSolutionIndex]);
 
   // Reset the selected polygons when the solution changes
   useEffect(() => {
-    setSelectedPolygons([]);
-  }, [selectedSolution]);
+    setSelectedPolygonIndexes([]);
+  }, [selectedSolutionIndex]);
+
+  useEffect(() => {
+    setSelectedPolygonIndexes([]);
+    console.log({ selectedSolutionIndex }, solutions.length - 1)
+    if (selectedSolutionIndex > solutions.length - 1) {
+      setSelectedSolutionIndex(solutions.length - 1);
+    }
+  }, [selectedSolutionIndex, solutions]);
 
   return (
     <SolutionContext.Provider
       value={{
-        selectedSolution,
-        setSelectedSolution,
-        payload,
-        apiResponse,
-        selectedPolygons,
-        setSelectedPolygons,
+        selectedSolutionIndex,
+        setSelectedSolutionIndex,
+        activeSolution,
+        solutions,
+        setSolutions,
+        selectedPolygonIndexes,
+        setSelectedPolygonIndexes,
       }}
     >
       {children}
