@@ -2,8 +2,8 @@ import { ReactNode, useMemo, useState, useEffect, useCallback } from 'react';
 import { FeatureCollection } from '../types';
 import { SolutionContext } from './SolutionContext';
 
-import responseOne from '../api-responses/SE_State_Management_Polygons_1.json';
-import responseTwo from '../api-responses/SE_State_Management_Polygons_2.json';
+import responseOne from '../data/SE_State_Management_Polygons_1.json';
+import responseTwo from '../data/SE_State_Management_Polygons_2.json';
 
 interface SolutionProviderProps {
   children: ReactNode;
