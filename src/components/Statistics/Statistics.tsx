@@ -11,10 +11,10 @@ function Statistics() {
 
   const stackedArea = useMemo(() => {
     let area = 0;
-    // Adds the areas of all selected polygons together.
-    for (const index of selectedPolygonIndexes) {
-      area += calculateArea(activeSolution.features[index].geometry);
-    }
+    // Add the areas of all selected polygons together.
+    selectedPolygonIndexes.forEach((polygonIndex) => {
+      area += calculateArea(activeSolution.features[polygonIndex].geometry);
+    });
     return area;
   }, [activeSolution, selectedPolygonIndexes]);
 

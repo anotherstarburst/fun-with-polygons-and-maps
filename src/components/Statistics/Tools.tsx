@@ -72,7 +72,7 @@ function ToolsComponent(props: ToolsComponentProps) {
     setSolutions(newSolutions);
   }
 
-  const btnDisabled = useMemo(() => {
+  const isBtnDisabled = useMemo(() => {
     return !(arePolygonsOverlapping || arePolygonsContained);
   }, [arePolygonsContained, arePolygonsOverlapping]);
 
@@ -86,12 +86,12 @@ function ToolsComponent(props: ToolsComponentProps) {
           const union = turf.union(turf.featureCollection(turfPolygons));
           updatePolygonsArray(union, solutions);
         }}
-        disabled={btnDisabled}
+        disabled={isBtnDisabled}
       >
-        {!btnDisabled && (
+        {!isBtnDisabled && (
           <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
         )}
-        {btnDisabled && <FontAwesomeIcon className="me-1" icon={faBan} />}
+        {isBtnDisabled && <FontAwesomeIcon className="me-1" icon={faBan} />}
         Union
       </button>
 
@@ -104,14 +104,14 @@ function ToolsComponent(props: ToolsComponentProps) {
 
           updatePolygonsArray(intersection, solutions);
         }}
-        disabled={btnDisabled}
+        disabled={isBtnDisabled}
       >
-        {!btnDisabled && (
+        {!isBtnDisabled && (
           <IntersectionAreaIcon
             selectedPolygonIndexes={selectedPolygonIndexes}
           />
         )}
-        {btnDisabled && <FontAwesomeIcon className="me-1" icon={faBan} />}
+        {isBtnDisabled && <FontAwesomeIcon className="me-1" icon={faBan} />}
         Intersection
       </button>
     </div>
