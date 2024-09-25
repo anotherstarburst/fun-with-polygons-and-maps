@@ -9,9 +9,12 @@ import {
   faSquare,
   faToolbox,
 } from '@fortawesome/free-solid-svg-icons';
-import styles from './Statistics.module.scss';
+
 import * as turf from '@turf/turf';
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
+import UnionAreaIcon from './UnionAreaIcon';
+import StackedAreaIcon from './StackedAreaIcon';
+import IntersectionAreaIcon from './IntersectionAreaIcon';
 
 function Statistics() {
   const {
@@ -81,7 +84,7 @@ function Statistics() {
     return turf.area(intersection);
   }, [arePolygonsOverlapping, turfPolygons]);
 
-  if (!selectedPolygonIndexes.length)
+  if (selectedPolygonIndexes.length < 1)
     return (
       <div className="d-flex flex-column h-100 justify-content-center align-items-center">
         <p>Please select a polygon to start.</p>
@@ -110,28 +113,13 @@ function Statistics() {
                 updatePolygonsArray(union);
               }}
             >
-              <div
-                className={`${styles['custom-icon-stack']} ${styles[`total-icons-${selectedPolygonIndexes.length}`]}`}
-              >
-                {selectedPolygonIndexes.map((value, index) => (
-                  <span key={index} className={`${styles['fa-stack']}`}>
-                    <FontAwesomeIcon
-                      icon={faSquare}
-                      className={`${styles['stacked-icon']}`}
-                      style={{ color: polygonColorOptions[value] }}
-                    />
-                  </span>
-                ))}
-              </div>
+              <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
               Union
             </button>
             <button
               className="btn btn-outline-light w-100"
               onClick={() => {
-                // TODO: this will calculate the intersection of the selected polygons. It will then
-                // replace the polygons that were intersected, with the intersection.
-                // setSolutions will be used to update the solutions. Note selectedSolutionIndex corresponds
-                // to the activeSolution within the solutions array.
+                console.log({ turfPolygons });
                 const intersection = turf.intersect(
                   turf.featureCollection(turfPolygons)
                 );
@@ -139,7 +127,9 @@ function Statistics() {
                 updatePolygonsArray(intersection);
               }}
             >
-              <FontAwesomeIcon icon={faPizzaSlice} className="me-1" />
+              <IntersectionAreaIcon
+                selectedPolygonIndexes={selectedPolygonIndexes}
+              />
               Intersection
             </button>
           </div>
@@ -152,10 +142,14 @@ function Statistics() {
             <FontAwesomeIcon icon={faRuler} className="me-1" />
             Area
           </p>
+
+          {/* Right aligned, and monospaced so that it's easier to compare the numbers (spreadsheet style) */}
           <ul className="fa-ul ms-4 text-end font-monospace">
             {selectedPolygonIndexes.map((value) => {
               return (
-                <li>
+                <li
+                  title={`Individual area of ${polygonColorOptions[value]} polygon`}
+                >
                   <span className="fa-li">
                     <FontAwesomeIcon
                       icon={faSquare}
@@ -175,56 +169,38 @@ function Statistics() {
                 </li>
               );
             })}
+
             {selectedPolygonIndexes.length > 1 && (
-              <>
-                <li>
-                  <span className="fa-li">
-                    {selectedPolygonIndexes.map((value) => (
-                      <FontAwesomeIcon
-                        icon={faSquare}
-                        style={{
-                          color: polygonColorOptions[value],
-                          fontSize: '1em',
-                          marginRight: '1px',
-                        }}
-                      />
-                    ))}
-                  </span>
-                  {Math.floor(stackedArea).toLocaleString()} m<sup>2</sup>
-                </li>
-              </>
+              <li title="Stacked area">
+                <span className="fa-li">
+                  <StackedAreaIcon
+                    selectedPolygonIndexes={selectedPolygonIndexes}
+                  />
+                </span>
+                {Math.floor(stackedArea).toLocaleString()} m<sup>2</sup>
+              </li>
             )}
+
             {!isNaN(unionArea) && (
-              <>
-                <li>
-                  <span className="fa-li">
-                    <div
-                      className={`${styles['custom-icon-stack']} ${styles[`total-icons-${selectedPolygonIndexes.length}`]}`}
-                    >
-                      {selectedPolygonIndexes.map((value, index) => (
-                        <span key={index} className={`${styles['fa-stack']}`}>
-                          <FontAwesomeIcon
-                            icon={faSquare}
-                            className={`${styles['stacked-icon']}`}
-                            style={{ color: polygonColorOptions[value] }}
-                          />
-                        </span>
-                      ))}
-                    </div>
-                  </span>
-                  {Math.floor(unionArea).toLocaleString()} m<sup>2</sup>
-                </li>
-              </>
+              <li title="Union area">
+                <span className="fa-li">
+                  <UnionAreaIcon
+                    selectedPolygonIndexes={selectedPolygonIndexes}
+                  />
+                </span>
+                {Math.floor(unionArea).toLocaleString()} m<sup>2</sup>
+              </li>
             )}
+
             {!isNaN(intersectionArea) && (
-              <>
-                <li title="Intersection area">
-                  <span className="fa-li">
-                    <FontAwesomeIcon icon={faPizzaSlice} />
-                  </span>
-                  {Math.floor(intersectionArea).toLocaleString()} m<sup>2</sup>
-                </li>
-              </>
+              <li title="Intersection area">
+                <span className="fa-li">
+                  <IntersectionAreaIcon
+                    selectedPolygonIndexes={selectedPolygonIndexes}
+                  />
+                </span>
+                {Math.floor(intersectionArea).toLocaleString()} m<sup>2</sup>
+              </li>
             )}
           </ul>
         </div>
