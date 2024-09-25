@@ -23,6 +23,10 @@ This repository contains a web application for performing operations on polygons
 
 Any geospatial calculations, or the operations on the geospatial polygons is handled by the [@turf/turf](https://www.npmjs.com/package/@turf/turf) or [@vis.gl/react-google-maps](https://www.npmjs.com/package/@vis.gl/react-google-maps) packages, thus we'd be testing those libraries. While that might be sensible for a production grade application - it's outside of the remit of this exercise so we can hand off the work to the package maintainers.
 
+## Documentation
+
+The code is designed to be as self-explanatory as possible, so you can easily understand each component or functionality without needing extensive comments. When something isn't immediately clear—like a complex operation or less intuitive variable names — I've added a comment above the relevant bit to clarify it. This keeps the code clean and minimizes documentation rot.
+
 ## Getting Started
 
 To run this project locally, you'll need Node.js (version 20) installed on your machine.
