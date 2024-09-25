@@ -1,4 +1,4 @@
-// Adapted from: https://raw.githubusercontent.com/visgl/react-google-maps/refs/heads/main/examples/geometry/src/components/polygon.tsx
+// Adapted from: https://github.com/visgl/react-google-maps/blob/main/examples/geometry/src/components/polygon.tsx
 
 import {
   forwardRef,

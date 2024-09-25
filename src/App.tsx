@@ -14,7 +14,7 @@ function App() {
           <div className="col">
             <WorkSurface />
           </div>
-          <div className="col" style={{ maxWidth: '300px' }}>
+          <div className="col" style={{ maxWidth: '200px' }}>
             <Statistics />
           </div>
         </div>
