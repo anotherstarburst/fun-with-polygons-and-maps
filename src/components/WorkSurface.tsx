@@ -4,9 +4,10 @@ import { useSolutionContext } from './SolutionContext';
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import { FeatureCollection } from '../types';
 import { useMemo } from 'react';
-import { polygonColorOptions } from './utils';
+import { polygonColorOptions } from './constants';
 import { MAX_SELECTED_POLYGONS } from './constants';
 
+const SELECTED_POLYGON_COLOUR = '#fff';
 
 function getPolygons(payload: FeatureCollection) {
   return payload.features.map((feature) => {
@@ -37,7 +38,11 @@ function WorkSurface() {
           <Polygon
             key={index}
             paths={[path]}
-            strokeColor={selectedPolygons.includes(index) ? 'white' : polygonColorOptions[index]}
+            strokeColor={
+              selectedPolygons.includes(index)
+                ? SELECTED_POLYGON_COLOUR
+                : 'transparent'
+            }
             fillColor={polygonColorOptions[index]}
             onClick={() => {
               if (selectedPolygons.includes(index)) {
@@ -51,17 +56,13 @@ function WorkSurface() {
               // so that we can add the new one
               let currentPolygons = [...selectedPolygons];
               if (currentPolygons.length >= MAX_SELECTED_POLYGONS) {
-                currentPolygons = [
-                  ...currentPolygons.slice(1),
-                  index,
-                ];
+                currentPolygons = [...currentPolygons.slice(1), index];
                 setSelectedPolygons([...currentPolygons]);
                 return;
               }
 
               setSelectedPolygons([...currentPolygons, index]);
-            }
-            }
+            }}
           />
         ))}
       </Map>

@@ -1,6 +1,14 @@
 @import 'bootstrap/scss/bootstrap';
 
 // Hides the Google Maps Alert for no API key (just to avoid the error message for now)
-html > body > div > div > div > div:nth-child(2) > div > div > div:nth-child(2) {
-    display: none;
+html
+  > body
+  > div
+  > div
+  > div
+  > div:nth-child(2)
+  > div
+  > div
+  > div:nth-child(2) {
+  display: none;
 }
