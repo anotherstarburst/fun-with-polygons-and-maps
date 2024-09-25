@@ -2,7 +2,8 @@ import React from 'react';
 import { useSolutionContext } from './SolutionContext';
 
 const Solutions: React.FC = () => {
-  const { selectedSolutionIndex, setSelectedSolutionIndex } = useSolutionContext();
+  const { selectedSolutionIndex, setSelectedSolutionIndex } =
+    useSolutionContext();
 
   const handleSolutionChange = (solutionIndex: number) => {
     setSelectedSolutionIndex(solutionIndex);

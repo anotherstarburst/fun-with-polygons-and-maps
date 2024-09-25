@@ -15,7 +15,9 @@ export function SolutionProvider({ children }: SolutionProviderProps) {
   }, []);
 
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState<number>(0);
-  const [selectedPolygonIndexes, setSelectedPolygonIndexes] = useState<number[]>([]);
+  const [selectedPolygonIndexes, setSelectedPolygonIndexes] = useState<
+    number[]
+  >([]);
   const [solutions, setSolutions] = useState<FeatureCollection[]>(apiResponse);
 
   const activeSolution = useMemo(() => {
@@ -29,7 +31,6 @@ export function SolutionProvider({ children }: SolutionProviderProps) {
 
   useEffect(() => {
     setSelectedPolygonIndexes([]);
-    console.log({ selectedSolutionIndex }, solutions.length - 1)
     if (selectedSolutionIndex > solutions.length - 1) {
       setSelectedSolutionIndex(solutions.length - 1);
     }

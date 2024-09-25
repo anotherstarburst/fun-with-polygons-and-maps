@@ -8,8 +8,13 @@ import styles from './Statistics.module.scss';
 import * as turf from '@turf/turf';
 
 function Statistics() {
-  const { selectedPolygonIndexes, solutions, selectedSolutionIndex, setSolutions } =
-    useSolutionContext();
+  const {
+    selectedPolygonIndexes,
+    activeSolution,
+    selectedSolutionIndex,
+    setSolutions,
+    setSelectedPolygonIndexes,
+  } = useSolutionContext();
 
   const computedArea = useCallback((polygon: Geometry) => {
     const p = turf.polygon(polygon.coordinates);
@@ -19,40 +24,37 @@ function Statistics() {
   const stackedArea = useMemo(() => {
     let area = 0;
     // Adds the areas of all selected polygons together.
+    console.log({ selectedPolygonIndexes });
     for (const index of selectedPolygonIndexes) {
-      area += computedArea(
-        solutions[selectedSolutionIndex].features[index].geometry
-      );
+      area += computedArea(activeSolution.features[index].geometry);
     }
     return area;
-  }, [solutions, computedArea, selectedPolygonIndexes, selectedSolutionIndex]);
+  }, [activeSolution, computedArea, selectedPolygonIndexes]);
 
   const turfPolygons = useMemo(() => {
+    if (!activeSolution) return [];
+
+    if (selectedPolygonIndexes.length > 2)
+      throw new Error('Too many polygons selected');
+
     const polygons = [];
-    for (const index of selectedPolygonIndexes) {
-      const feature = solutions[selectedSolutionIndex];
-      const coordinates = feature?.features[index].geometry.coordinates;
-      polygons.push(
-        turf.polygon(coordinates, { fill: polygonColorOptions[index] })
-      );
+    for (const polygonIndex of selectedPolygonIndexes) {
+      const { coordinates } = activeSolution.features[polygonIndex].geometry;
+      polygons.push(turf.polygon(coordinates));
     }
     return polygons;
-  }, [selectedPolygonIndexes, selectedSolutionIndex, solutions]);
+  }, [selectedPolygonIndexes, activeSolution]);
 
   const arePolygonsOverlapping = useMemo(() => {
     // Impossible to have overlapping polygons if there is only one polygon
     if (turfPolygons.length < 2) return false;
 
-    if (turfPolygons.length > 2)
-      throw new Error('Too many polygons selected');
-
     return turf.booleanOverlap(turfPolygons[0], turfPolygons[1]);
   }, [turfPolygons]);
 
-
-
   const unionArea = useMemo(() => {
     // Only calculated if there are two or more selected polygons and all overlap
+    // otherwise we'll get MultiPolygons for union and we can't calculate the area
     if (!arePolygonsOverlapping) return NaN;
 
     const union = turf.union(turf.featureCollection(turfPolygons));
@@ -64,6 +66,7 @@ function Statistics() {
 
   const intersectionArea = useMemo(() => {
     // Only calculated if there are two or more selected polygons and all overlap
+    // otherwise we'll get MultiPolygons for intersection and we can't calculate the area
     if (!arePolygonsOverlapping) return NaN;
 
     const intersection = turf.intersect(turf.featureCollection(turfPolygons));
@@ -86,11 +89,49 @@ function Statistics() {
       <div>
         {arePolygonsOverlapping && (
           <div className="mt-1">
-            <button className="btn btn-outline-light w-100 mb-1"
+            <button
+              className="btn btn-outline-light w-100 mb-1"
               onClick={() => {
-                // this will collect the selected polygons and figure out their union polygon. It will then
-                // create a new solutions array, replacing the old one with the new one and call setSolutions
-                // to update the map.
+                // This will calculate the union of the selected polygons. It will then
+                // replace the polygons that were united, with the union.
+                // setSolutions will be used to update the solutions. Note selectedSolutionIndex corresponds
+                // to the activeSolution within the solutions array.
+                const union = turf.union(turf.featureCollection(turfPolygons));
+
+                // We get a race condition otherwise, so we need to clone the array
+                // and reset the selected polygons to an empty array
+                const selectedPolygonIndexesClone = [...selectedPolygonIndexes];
+                setSelectedPolygonIndexes([]);
+
+                setSolutions((prevSolutions) => {
+                  if (!union) return prevSolutions;
+
+                  if (union.geometry.type !== 'Polygon') return prevSolutions;
+
+                  const newSolutions = [...prevSolutions];
+                  const newFeatures = [
+                    ...newSolutions[selectedSolutionIndex].features,
+                  ];
+
+                  // Remove the original polygons
+                  const updatedFeatures = newFeatures.filter(
+                    (_, index) => !selectedPolygonIndexesClone.includes(index)
+                  );
+
+                  // Add the union polygon
+                  updatedFeatures.push({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: union.geometry,
+                  });
+
+                  newSolutions[selectedSolutionIndex] = {
+                    ...newSolutions[selectedSolutionIndex],
+                    features: updatedFeatures,
+                  };
+
+                  return newSolutions;
+                });
               }}
             >
               <div
@@ -108,13 +149,52 @@ function Statistics() {
               </div>
               Union
             </button>
-            <button className="btn btn-outline-light w-100"
+            <button
+              className="btn btn-outline-light w-100"
               onClick={() => {
-                // this will collect the selected polygons and figure out their intersection polygon. It will then
-                // create a new solutions array, replacing the old one with the new one and call setSolutions
-                // to update the map.
-                const intersection = turf.intersect(turf.featureCollection(turfPolygons));
+                // TODO: this will calculate the intersection of the selected polygons. It will then
+                // replace the polygons that were intersected, with the intersection.
+                // setSolutions will be used to update the solutions. Note selectedSolutionIndex corresponds
+                // to the activeSolution within the solutions array.
+                const intersection = turf.intersect(
+                  turf.featureCollection(turfPolygons)
+                );
 
+                // We get a race condition otherwise, so we need to clone the array
+                // and reset the selected polygons to an empty array
+                const selectedPolygonIndexesClone = [...selectedPolygonIndexes];
+                setSelectedPolygonIndexes([]);
+
+                setSolutions((prevSolutions) => {
+                  if (!intersection) return prevSolutions;
+
+                  if (intersection.geometry.type !== 'Polygon')
+                    return prevSolutions;
+
+                  const newSolutions = [...prevSolutions];
+                  const newFeatures = [
+                    ...newSolutions[selectedSolutionIndex].features,
+                  ];
+
+                  // Remove the original polygons
+                  const updatedFeatures = newFeatures.filter(
+                    (_, index) => !selectedPolygonIndexesClone.includes(index)
+                  );
+
+                  // Add the union polygon
+                  updatedFeatures.push({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: intersection.geometry,
+                  });
+
+                  newSolutions[selectedSolutionIndex] = {
+                    ...newSolutions[selectedSolutionIndex],
+                    features: updatedFeatures,
+                  };
+
+                  return newSolutions;
+                });
               }}
             >
               <FontAwesomeIcon icon={faPizzaSlice} className="me-1" />
@@ -140,12 +220,10 @@ function Statistics() {
                     />
                   </span>
                   <span
-                    title={`${computedArea(solutions[selectedSolutionIndex].features[value].geometry)}`}
+                    title={`${computedArea(activeSolution.features[value].geometry)}`}
                   >
                     {Math.floor(
-                      computedArea(
-                        solutions[selectedSolutionIndex].features[value].geometry
-                      )
+                      computedArea(activeSolution.features[value].geometry)
                     ).toLocaleString()}{' '}
                     m<sup>2</sup>
                   </span>
