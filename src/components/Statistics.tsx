@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPizzaSlice, faSquare } from '@fortawesome/free-solid-svg-icons';
 import styles from './Statistics.module.scss';
 import * as turf from '@turf/turf';
+import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
 
 function Statistics() {
   const {
@@ -98,40 +99,7 @@ function Statistics() {
                 // to the activeSolution within the solutions array.
                 const union = turf.union(turf.featureCollection(turfPolygons));
 
-                // We get a race condition otherwise, so we need to clone the array
-                // and reset the selected polygons to an empty array
-                const selectedPolygonIndexesClone = [...selectedPolygonIndexes];
-                setSelectedPolygonIndexes([]);
-
-                setSolutions((prevSolutions) => {
-                  if (!union) return prevSolutions;
-
-                  if (union.geometry.type !== 'Polygon') return prevSolutions;
-
-                  const newSolutions = [...prevSolutions];
-                  const newFeatures = [
-                    ...newSolutions[selectedSolutionIndex].features,
-                  ];
-
-                  // Remove the original polygons
-                  const updatedFeatures = newFeatures.filter(
-                    (_, index) => !selectedPolygonIndexesClone.includes(index)
-                  );
-
-                  // Add the union polygon
-                  updatedFeatures.push({
-                    type: 'Feature',
-                    properties: {},
-                    geometry: union.geometry,
-                  });
-
-                  newSolutions[selectedSolutionIndex] = {
-                    ...newSolutions[selectedSolutionIndex],
-                    features: updatedFeatures,
-                  };
-
-                  return newSolutions;
-                });
+                updatePolygonsArray(union);
               }}
             >
               <div
@@ -160,41 +128,7 @@ function Statistics() {
                   turf.featureCollection(turfPolygons)
                 );
 
-                // We get a race condition otherwise, so we need to clone the array
-                // and reset the selected polygons to an empty array
-                const selectedPolygonIndexesClone = [...selectedPolygonIndexes];
-                setSelectedPolygonIndexes([]);
-
-                setSolutions((prevSolutions) => {
-                  if (!intersection) return prevSolutions;
-
-                  if (intersection.geometry.type !== 'Polygon')
-                    return prevSolutions;
-
-                  const newSolutions = [...prevSolutions];
-                  const newFeatures = [
-                    ...newSolutions[selectedSolutionIndex].features,
-                  ];
-
-                  // Remove the original polygons
-                  const updatedFeatures = newFeatures.filter(
-                    (_, index) => !selectedPolygonIndexesClone.includes(index)
-                  );
-
-                  // Add the union polygon
-                  updatedFeatures.push({
-                    type: 'Feature',
-                    properties: {},
-                    geometry: intersection.geometry,
-                  });
-
-                  newSolutions[selectedSolutionIndex] = {
-                    ...newSolutions[selectedSolutionIndex],
-                    features: updatedFeatures,
-                  };
-
-                  return newSolutions;
-                });
+                updatePolygonsArray(intersection);
               }}
             >
               <FontAwesomeIcon icon={faPizzaSlice} className="me-1" />
@@ -286,6 +220,44 @@ function Statistics() {
       )}
     </div>
   );
+
+  function updatePolygonsArray(
+    newPolygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | null
+  ) {
+    // We need to reset the selected polygons to an empty array before we update
+    // the polygons array otherwise a race condition will occur as solutions
+    // updates, triggering hooks, before the selected polygons array is updated.
+    const selectedPolygonIndexesClone = [...selectedPolygonIndexes];
+    setSelectedPolygonIndexes([]);
+
+    setSolutions((prevSolutions) => {
+      if (!newPolygon) return prevSolutions;
+
+      if (newPolygon.geometry.type !== 'Polygon') return prevSolutions;
+
+      const newSolutions = [...prevSolutions];
+      const newFeatures = [...newSolutions[selectedSolutionIndex].features];
+
+      // Remove the original polygons
+      const updatedFeatures = newFeatures.filter(
+        (_, index) => !selectedPolygonIndexesClone.includes(index)
+      );
+
+      // Add the union polygon
+      updatedFeatures.push({
+        type: 'Feature',
+        properties: {},
+        geometry: newPolygon.geometry,
+      });
+
+      newSolutions[selectedSolutionIndex] = {
+        ...newSolutions[selectedSolutionIndex],
+        features: updatedFeatures,
+      };
+
+      return newSolutions;
+    });
+  }
 }
 
 export default Statistics;
