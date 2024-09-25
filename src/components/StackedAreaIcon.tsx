@@ -13,6 +13,7 @@ export default function StackedAreaIcon(props: StackedAreaIconProps) {
             {selectedPolygonIndexes.map((value) => (
                 <FontAwesomeIcon
                     icon={faSquare}
+                    key={`${polygonColorOptions[value]}-icon`}
                     style={{
                         color: polygonColorOptions[value],
                         fontSize: '1em',

@@ -13,6 +13,7 @@ import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
 import UnionAreaIcon from './UnionAreaIcon';
 import StackedAreaIcon from './StackedAreaIcon';
 import IntersectionAreaIcon from './IntersectionAreaIcon';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 function Statistics() {
   const {
@@ -101,6 +102,101 @@ function Statistics() {
       </div>
     );
 
+
+  const StackedAreaComponent = () => {
+    if (selectedPolygonIndexes.length < 2) return null;
+
+    return (
+      <OverlayTrigger
+        placement="auto"
+        overlay={<Tooltip >
+          Sum of the area of the selected polygons.
+        </Tooltip>}
+      >
+        <li>
+          <span className="fa-li">
+            <StackedAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
+          </span>
+          {Math.floor(stackedArea).toLocaleString()} m<sup>2</sup>
+        </li>
+      </OverlayTrigger>
+    );
+  };
+
+  const UnionAreaComponent = () => {
+    if (isNaN(unionArea)) return null;
+    return (<OverlayTrigger
+      placement="auto"
+      overlay={<Tooltip >
+        Area of the union of the selected polygons.
+      </Tooltip>}
+    >
+      <li  >
+        <span className="fa-li">
+          <UnionAreaIcon
+            selectedPolygonIndexes={selectedPolygonIndexes}
+          />
+        </span>
+        {Math.floor(unionArea).toLocaleString()} m<sup>2</sup>
+      </li>
+    </OverlayTrigger>)
+  }
+
+  const IntersectionAreaComponent = () => {
+    if (isNaN(intersectionArea)) return null;
+    return (<OverlayTrigger
+      placement="auto"
+      overlay={<Tooltip >
+        Area of the intersection of the selected polygons.
+      </Tooltip>}
+    >
+      <li title="Intersection area">
+        <span className="fa-li">
+          <IntersectionAreaIcon
+            selectedPolygonIndexes={selectedPolygonIndexes}
+          />
+        </span>
+        {Math.floor(intersectionArea).toLocaleString()} m<sup>2</sup>
+      </li>
+    </OverlayTrigger>)
+  }
+
+  const IndividualAreaComponent = (props: { polygonIndex: number }) => {
+    const {
+      polygonIndex,
+
+    } = props;
+
+    return (<OverlayTrigger
+      placement="auto"
+      overlay={<Tooltip >
+        Area of the {polygonColorOptions[polygonIndex]} polygon
+      </Tooltip>}
+    >
+      <li
+
+      >
+        <span className="fa-li">
+          <FontAwesomeIcon
+            icon={faSquare}
+            style={{
+              color: polygonColorOptions[polygonIndex],
+            }}
+          />
+        </span>
+        <span
+          title={`${calculateArea(activeSolution.features[polygonIndex].geometry)}`}
+        >
+          {Math.floor(
+            calculateArea(activeSolution.features[polygonIndex].geometry)
+          ).toLocaleString()}{' '}
+          m<sup>2</sup>
+        </span>
+      </li></OverlayTrigger>
+    )
+
+  }
+
   return (
     <div className="d-flex flex-column h-100 justify-content-between">
       {selectedPolygonIndexes.length > 0 && (
@@ -114,61 +210,16 @@ function Statistics() {
           <ul className="fa-ul ms-4 text-end font-monospace">
             {selectedPolygonIndexes.map((value) => {
               return (
-                <li
-                  title={`Individual area of ${polygonColorOptions[value]} polygon`}
-                >
-                  <span className="fa-li">
-                    <FontAwesomeIcon
-                      icon={faSquare}
-                      style={{
-                        color: polygonColorOptions[value],
-                      }}
-                    />
-                  </span>
-                  <span
-                    title={`${calculateArea(activeSolution.features[value].geometry)}`}
-                  >
-                    {Math.floor(
-                      calculateArea(activeSolution.features[value].geometry)
-                    ).toLocaleString()}{' '}
-                    m<sup>2</sup>
-                  </span>
-                </li>
+                <IndividualAreaComponent polygonIndex={value} key={`${polygonColorOptions[value]}-polygon`} />
               );
             })}
 
-            {selectedPolygonIndexes.length > 1 && (
-              <li title="Stacked area">
-                <span className="fa-li">
-                  <StackedAreaIcon
-                    selectedPolygonIndexes={selectedPolygonIndexes}
-                  />
-                </span>
-                {Math.floor(stackedArea).toLocaleString()} m<sup>2</sup>
-              </li>
-            )}
 
-            {!isNaN(unionArea) && (
-              <li title="Union area">
-                <span className="fa-li">
-                  <UnionAreaIcon
-                    selectedPolygonIndexes={selectedPolygonIndexes}
-                  />
-                </span>
-                {Math.floor(unionArea).toLocaleString()} m<sup>2</sup>
-              </li>
-            )}
+            <StackedAreaComponent />
+            <UnionAreaComponent />
+            <IntersectionAreaComponent />
 
-            {!isNaN(intersectionArea) && (
-              <li title="Intersection area">
-                <span className="fa-li">
-                  <IntersectionAreaIcon
-                    selectedPolygonIndexes={selectedPolygonIndexes}
-                  />
-                </span>
-                {Math.floor(intersectionArea).toLocaleString()} m<sup>2</sup>
-              </li>
-            )}
+
           </ul>
         </div>
       )}
