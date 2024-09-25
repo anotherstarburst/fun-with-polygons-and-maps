@@ -1,5 +1,7 @@
 import React from 'react';
 import { useSolutionContext } from './SolutionContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 
 const Solutions: React.FC = () => {
   const {
@@ -16,7 +18,10 @@ const Solutions: React.FC = () => {
 
   return (
     <>
-      <h3>Solutions</h3>
+      <p className="text-secondary fs-4 m-3">
+        <FontAwesomeIcon icon={faLayerGroup} className="me-1" />
+        Solutions
+      </p>
       <ul className="list-group list-group-flush">
         <li className="list-group-item">
           <input

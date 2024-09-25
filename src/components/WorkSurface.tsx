@@ -34,7 +34,7 @@ function WorkSurface() {
         defaultZoom={16}
         defaultCenter={defaultCenter}
         mapId="DEMO_MAP_ID"
-        className="vh-100"
+        className="vh-100 card"
       >
         {paths.map((path, index) => (
           <Polygon

@@ -3,7 +3,12 @@ import { useCallback, useMemo } from 'react';
 import { polygonColorOptions } from './constants';
 import { Geometry } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPizzaSlice, faSquare } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPizzaSlice,
+  faRuler,
+  faSquare,
+  faToolbox,
+} from '@fortawesome/free-solid-svg-icons';
 import styles from './Statistics.module.scss';
 import * as turf from '@turf/turf';
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
@@ -88,9 +93,13 @@ function Statistics() {
     <div className="d-flex flex-column h-100 justify-content-between">
       <div>
         {arePolygonsOverlapping && (
-          <div className="mt-1">
+          <div>
+            <p className="text-secondary fs-4 mt-3">
+              <FontAwesomeIcon icon={faToolbox} className="me-1" />
+              Tools
+            </p>
             <button
-              className="btn btn-outline-light w-100 mb-1"
+              className="btn btn-outline-light w-100 mb-2"
               onClick={() => {
                 // This will calculate the union of the selected polygons. It will then
                 // replace the polygons that were united, with the union.
@@ -139,7 +148,10 @@ function Statistics() {
 
       {selectedPolygonIndexes.length > 0 && (
         <div>
-          <p className="text-secondary fs-6">Selected Area</p>
+          <p className="text-secondary fs-4">
+            <FontAwesomeIcon icon={faRuler} className="me-1" />
+            Area
+          </p>
           <ul className="fa-ul ms-4 text-end font-monospace">
             {selectedPolygonIndexes.map((value) => {
               return (
