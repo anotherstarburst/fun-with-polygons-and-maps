@@ -17,7 +17,7 @@ function Statistics() {
     setSelectedPolygonIndexes,
   } = useSolutionContext();
 
-  const computedArea = useCallback((polygon: Geometry) => {
+  const calculateArea = useCallback((polygon: Geometry) => {
     const p = turf.polygon(polygon.coordinates);
     return turf.area(p);
   }, []);
@@ -25,12 +25,11 @@ function Statistics() {
   const stackedArea = useMemo(() => {
     let area = 0;
     // Adds the areas of all selected polygons together.
-    console.log({ selectedPolygonIndexes });
     for (const index of selectedPolygonIndexes) {
-      area += computedArea(activeSolution.features[index].geometry);
+      area += calculateArea(activeSolution.features[index].geometry);
     }
     return area;
-  }, [activeSolution, computedArea, selectedPolygonIndexes]);
+  }, [activeSolution, calculateArea, selectedPolygonIndexes]);
 
   const turfPolygons = useMemo(() => {
     if (!activeSolution) return [];
@@ -154,10 +153,10 @@ function Statistics() {
                     />
                   </span>
                   <span
-                    title={`${computedArea(activeSolution.features[value].geometry)}`}
+                    title={`${calculateArea(activeSolution.features[value].geometry)}`}
                   >
                     {Math.floor(
-                      computedArea(activeSolution.features[value].geometry)
+                      calculateArea(activeSolution.features[value].geometry)
                     ).toLocaleString()}{' '}
                     m<sup>2</sup>
                   </span>
@@ -231,9 +230,15 @@ function Statistics() {
     setSelectedPolygonIndexes([]);
 
     setSolutions((prevSolutions) => {
-      if (!newPolygon) return prevSolutions;
+      if (!newPolygon) {
+        console.error('No polygon');
+        return prevSolutions;
+      }
 
-      if (newPolygon.geometry.type !== 'Polygon') return prevSolutions;
+      if (newPolygon.geometry.type !== 'Polygon') {
+        console.log("Not a polygon, it's a: " + newPolygon.geometry.type);
+        return prevSolutions;
+      }
 
       const newSolutions = [...prevSolutions];
       const newFeatures = [...newSolutions[selectedSolutionIndex].features];

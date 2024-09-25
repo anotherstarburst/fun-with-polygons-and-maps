@@ -2,10 +2,15 @@ import React from 'react';
 import { useSolutionContext } from './SolutionContext';
 
 const Solutions: React.FC = () => {
-  const { selectedSolutionIndex, setSelectedSolutionIndex } =
-    useSolutionContext();
+  const {
+    selectedSolutionIndex,
+    setSelectedSolutionIndex,
+    setSelectedPolygonIndexes,
+  } = useSolutionContext();
 
   const handleSolutionChange = (solutionIndex: number) => {
+    // Clear the selected polygon indexes to avoid race conditions.
+    setSelectedPolygonIndexes([]);
     setSelectedSolutionIndex(solutionIndex);
   };
 
