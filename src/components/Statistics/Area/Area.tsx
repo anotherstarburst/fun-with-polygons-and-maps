@@ -2,7 +2,7 @@ import { polygonColorOptions } from '../../constants';
 import IndividualArea from './Individual';
 import IntersectionArea from './Intersection';
 import StackedArea from './Stacked';
-import AreaUnion from './Union';
+import UnionArea from './Union';
 import { useSolutionContext } from '../../../context/SolutionContext';
 
 function Area() {
@@ -24,7 +24,7 @@ function Area() {
         })}
 
         <StackedArea />
-        <AreaUnion />
+        <UnionArea />
         <IntersectionArea />
       </ul>
     </div>

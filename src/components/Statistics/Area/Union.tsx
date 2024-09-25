@@ -3,7 +3,7 @@ import { useSolutionContext } from '../../../context/SolutionContext';
 import UnionAreaIcon from '../../icons/UnionAreaIcon';
 import { useStatisticsContext } from '../../../context/StatisticsContext';
 
-const AreaUnion = () => {
+const UnionArea = () => {
   const { unionArea } = useStatisticsContext();
   const { selectedPolygonIndexes } = useSolutionContext();
 
@@ -24,4 +24,4 @@ const AreaUnion = () => {
   );
 };
 
-export default AreaUnion;
+export default UnionArea;
