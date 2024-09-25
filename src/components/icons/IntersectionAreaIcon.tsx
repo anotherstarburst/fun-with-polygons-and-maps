@@ -1,6 +1,6 @@
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 
-import { polygonColorOptions } from './constants';
+import { polygonColorOptions } from '../constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IntersectionAreaIconProps {

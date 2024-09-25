@@ -1,4 +1,4 @@
-import { polygonColorOptions } from './constants';
+import { polygonColorOptions } from '../constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 

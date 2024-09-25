@@ -1,11 +1,11 @@
 import { Polygon } from './Polygon';
-import { useSolutionContext } from './SolutionContext';
+import { useSolutionContext } from '../../context/SolutionContext';
 
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
-import { FeatureCollection } from '../types';
+import { FeatureCollection } from '../../types';
 import { useMemo } from 'react';
-import { polygonColorOptions } from './constants';
-import { MAX_SELECTED_POLYGONS } from './constants';
+import { polygonColorOptions } from '../constants';
+import { MAX_SELECTED_POLYGONS } from '../constants';
 import * as turf from '@turf/turf';
 
 const SELECTED_POLYGON_COLOUR = '#fff';

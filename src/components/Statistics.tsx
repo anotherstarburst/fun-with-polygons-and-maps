@@ -1,4 +1,4 @@
-import { useSolutionContext } from './SolutionContext';
+import { useSolutionContext } from '../context/SolutionContext';
 import { useCallback, useMemo } from 'react';
 import { polygonColorOptions } from './constants';
 import { Geometry } from '../types';
@@ -7,9 +7,9 @@ import { faRuler, faSquare } from '@fortawesome/free-solid-svg-icons';
 
 import * as turf from '@turf/turf';
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
-import UnionAreaIcon from './UnionAreaIcon';
-import StackedAreaIcon from './StackedAreaIcon';
-import IntersectionAreaIcon from './IntersectionAreaIcon';
+import UnionAreaIcon from './icons/UnionAreaIcon';
+import StackedAreaIcon from './icons/StackedAreaIcon';
+import IntersectionAreaIcon from './icons/IntersectionAreaIcon';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 function Statistics() {

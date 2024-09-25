@@ -1,7 +1,7 @@
-import SolutionProvider from './SolutionProvider';
+import { SolutionProvider } from './context/SolutionProvider';
 import Solutions from './components/Solutions';
 import Statistics from './components/Statistics';
-import WorkSurface from './components/WorkSurface';
+import WorkSurface from './components/WorkSurface/WorkSurface';
 
 function App() {
   return (

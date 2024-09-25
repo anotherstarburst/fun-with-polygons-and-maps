@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSolutionContext } from './SolutionContext';
+import { useSolutionContext } from '../context/SolutionContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';

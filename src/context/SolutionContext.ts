@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 import { FeatureCollection } from '../types';
 
+
 interface SolutionContextType {
   selectedPolygonIndexes: number[];
   setSelectedPolygonIndexes: Dispatch<SetStateAction<number[]>>;
@@ -24,3 +25,5 @@ export function useSolutionContext() {
   }
   return context;
 }
+
+
