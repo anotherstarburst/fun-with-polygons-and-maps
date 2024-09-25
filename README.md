@@ -19,6 +19,10 @@ This repository contains a web application for performing operations on polygons
 - Deployment: GitHub Pages
 - Language: TypeScript
 
+## Tests
+
+Any geospatial calculations, or the operations on the geospatial polygons is handled by the [@turf/turf](https://www.npmjs.com/package/@turf/turf) or [@vis.gl/react-google-maps](https://www.npmjs.com/package/@vis.gl/react-google-maps) packages, thus we'd be testing those libraries. While that might be sensible for a production grade application - it's outside of the remit of this exercise so we can hand off the work to the package maintainers.
+
 ## Getting Started
 
 To run this project locally, you'll need Node.js (version 20) installed on your machine.
