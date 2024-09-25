@@ -1,5 +1,3 @@
-import { faRuler } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { polygonColorOptions } from '../../constants';
 import IndividualArea from './Individual';
 import IntersectionArea from './Intersection';
@@ -18,12 +16,7 @@ function Area(props: {
   if (selectedPolygonIndexes.length < 1) return null;
 
   return (
-    <div>
-      <p className="text-secondary fs-4">
-        <FontAwesomeIcon icon={faRuler} className="me-1" />
-        Area
-      </p>
-
+    <div className="mt-3">
       {/* Right aligned, and monospaced so that it's easier to compare the numbers (spreadsheet style) */}
       <ul className="fa-ul ms-4 text-end font-monospace">
         {selectedPolygonIndexes.map((value) => {

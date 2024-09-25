@@ -4,6 +4,9 @@ import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
 import IntersectionAreaIcon from '../icons/IntersectionAreaIcon';
 import UnionAreaIcon from '../icons/UnionAreaIcon';
 import * as turf from '@turf/turf';
+import { useMemo } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBan } from '@fortawesome/free-solid-svg-icons';
 
 interface ToolsComponentProps {
   arePolygonsOverlapping: boolean;
@@ -69,23 +72,31 @@ function ToolsComponent(props: ToolsComponentProps) {
     setSolutions(newSolutions);
   }
 
-  if (!arePolygonsOverlapping && !arePolygonsContained) return null;
+  const btnDisabled = useMemo(() => {
+    return !(arePolygonsOverlapping || arePolygonsContained);
+  }, [arePolygonsContained, arePolygonsOverlapping]);
+
+  if (selectedPolygonIndexes.length < 2) return null;
 
   return (
     <div>
       <button
-        className="btn btn-outline-light w-100 mb-2"
+        className={`btn btn-outline-light w-100 mb-2`}
         onClick={() => {
           const union = turf.union(turf.featureCollection(turfPolygons));
           updatePolygonsArray(union, solutions);
         }}
+        disabled={btnDisabled}
       >
-        <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
+        {!btnDisabled && (
+          <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
+        )}
+        {btnDisabled && <FontAwesomeIcon className="me-1" icon={faBan} />}
         Union
       </button>
 
       <button
-        className="btn btn-outline-light w-100 mb-2"
+        className={`btn btn-outline-light w-100 mb-2`}
         onClick={() => {
           const intersection = turf.intersect(
             turf.featureCollection(turfPolygons)
@@ -93,8 +104,14 @@ function ToolsComponent(props: ToolsComponentProps) {
 
           updatePolygonsArray(intersection, solutions);
         }}
+        disabled={btnDisabled}
       >
-        <IntersectionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
+        {!btnDisabled && (
+          <IntersectionAreaIcon
+            selectedPolygonIndexes={selectedPolygonIndexes}
+          />
+        )}
+        {btnDisabled && <FontAwesomeIcon className="me-1" icon={faBan} />}
         Intersection
       </button>
     </div>
