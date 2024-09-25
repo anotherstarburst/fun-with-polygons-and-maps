@@ -6,6 +6,7 @@ import { FeatureCollection } from '../types';
 import { useMemo } from 'react';
 import { polygonColorOptions } from './constants';
 import { MAX_SELECTED_POLYGONS } from './constants';
+import * as turf from '@turf/turf';
 
 const SELECTED_POLYGON_COLOUR = '#fff';
 
@@ -25,8 +26,24 @@ function WorkSurface() {
   const paths = useMemo(() => getPolygons(activeSolution), [activeSolution]);
 
   const defaultCenter = useMemo(() => {
-    return paths[0][0];
-  }, [paths]);
+    const points: number[][] = [];
+    activeSolution.features.forEach((feature) => {
+      feature.geometry.coordinates[0].forEach((coord) => {
+        points.push([coord[0], coord[1]]);
+      });
+    });
+
+    if (!points || !points.length) return paths[0][0];
+
+    const features = turf.points(points);
+
+    const center = turf.center(features);
+
+    return {
+      lat: center?.geometry?.coordinates[1],
+      lng: center?.geometry?.coordinates[0],
+    };
+  }, [activeSolution.features, paths]);
 
   return (
     <APIProvider apiKey={''}>
