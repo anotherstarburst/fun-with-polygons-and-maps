@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 import { getAreaOfPolygon } from 'geolib';
 import { GeolibInputCoordinates } from 'geolib/es/types';
+import styles from './Statistics.module.scss';
 
 function Statistics() {
   const { selectedPolygons, apiResponse, selectedSolution } =
@@ -16,9 +17,26 @@ function Statistics() {
 
   const computedArea = useCallback((polygon: Geometry) => {
     const points = polygon.coordinates[0] as GeolibInputCoordinates[];
-    console.log({ points });
     return getAreaOfPolygon(points);
   }, []);
+
+  const allSelectedPolygonsGeometry = useMemo(() => {
+    const selectedPolygonsGeometry: Geometry = {
+      type: 'Polygon',
+      coordinates: [[]],
+    };
+
+    for (const index of selectedPolygons) {
+      const feature = apiResponse[selectedSolution];
+      const coordinates = feature?.features[index].geometry.coordinates;
+      selectedPolygonsGeometry.coordinates[0] = [
+        ...selectedPolygonsGeometry.coordinates[0],
+        ...coordinates[0],
+      ];
+    }
+
+    return selectedPolygonsGeometry;
+  }, [selectedPolygons, apiResponse, selectedSolution]);
 
   return (
     <>
@@ -51,6 +69,50 @@ function Statistics() {
                 </li>
               );
             })}
+            {selectedPolygons.length > 1 && (
+              <>
+                <li>
+                  <span className="fa-li">
+                    {selectedPolygons.map((value) => (
+                      <FontAwesomeIcon
+                        icon={faSquare}
+                        style={{
+                          color: polygonColorOptions[value],
+                          fontSize: '1em',
+                          marginRight: '1px',
+                        }}
+                      />
+                    ))}
+                  </span>
+                  {Math.floor(
+                    computedArea(allSelectedPolygonsGeometry)
+                  ).toLocaleString()}{' '}
+                  m<sup>2</sup>
+                </li>
+              </>
+            )}
+            {selectedPolygons.length > 1 && (
+              <>
+                <li>
+                  <span className="fa-li">
+                    <div
+                      className={`${styles['custom-icon-stack']} ${styles[`total-icons-${selectedPolygons.length}`]}`}
+                    >
+                      {selectedPolygons.map((value, index) => (
+                        <span key={index} className={`${styles['fa-stack']}`}>
+                          <FontAwesomeIcon
+                            icon={faSquare}
+                            className={`${styles['stacked-icon']}`}
+                            style={{ color: polygonColorOptions[value] }}
+                          />
+                        </span>
+                      ))}
+                    </div>
+                  </span>
+                  TODO m<sup>2</sup>
+                </li>
+              </>
+            )}
           </ul>
         </>
       )}

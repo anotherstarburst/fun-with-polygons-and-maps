@@ -21,7 +21,9 @@ function getPolygons(payload: FeatureCollection) {
 function WorkSurface() {
   const { payload, setSelectedPolygons, selectedPolygons } =
     useSolutionContext();
+
   const paths = useMemo(() => getPolygons(payload), [payload]);
+
   const defaultCenter = useMemo(() => {
     return paths[0][0];
   }, [paths]);
