@@ -12,6 +12,11 @@ import StackedAreaIcon from './icons/StackedAreaIcon';
 import IntersectionAreaIcon from './icons/IntersectionAreaIcon';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
+const calculateArea = (polygon: Geometry) => {
+  const p = turf.polygon(polygon.coordinates);
+  return turf.area(p);
+};
+
 function Statistics() {
   const {
     selectedPolygonIndexes,
@@ -20,11 +25,6 @@ function Statistics() {
     setSolutions,
     solutions,
   } = useSolutionContext();
-
-  const calculateArea = useCallback((polygon: Geometry) => {
-    const p = turf.polygon(polygon.coordinates);
-    return turf.area(p);
-  }, []);
 
   const stackedArea = useMemo(() => {
     let area = 0;
