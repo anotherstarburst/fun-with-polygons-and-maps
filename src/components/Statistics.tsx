@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faRuler,
   faSquare,
-  faToolbox,
 } from '@fortawesome/free-solid-svg-icons';
 
 import * as turf from '@turf/turf';
@@ -103,46 +102,7 @@ function Statistics() {
     );
 
   return (
-    // space between the two containers
     <div className="d-flex flex-column h-100 justify-content-between">
-      <div>
-        {(arePolygonsOverlapping || arePolygonsContained) && (
-          <div>
-            <p className="text-secondary fs-4 mt-3">
-              <FontAwesomeIcon icon={faToolbox} className="me-1" />
-              Tools
-            </p>
-
-            <button
-              className="btn btn-outline-light w-100 mb-2"
-              onClick={() => {
-                const union = turf.union(turf.featureCollection(turfPolygons));
-                updatePolygonsArray(union);
-              }}
-            >
-              <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
-              Union
-            </button>
-
-            <button
-              className="btn btn-outline-light w-100"
-              onClick={() => {
-                const intersection = turf.intersect(
-                  turf.featureCollection(turfPolygons)
-                );
-
-                updatePolygonsArray(intersection);
-              }}
-            >
-              <IntersectionAreaIcon
-                selectedPolygonIndexes={selectedPolygonIndexes}
-              />
-              Intersection
-            </button>
-          </div>
-        )}
-      </div>
-
       {selectedPolygonIndexes.length > 0 && (
         <div>
           <p className="text-secondary fs-4">
@@ -212,6 +172,38 @@ function Statistics() {
           </ul>
         </div>
       )}
+      <div>
+        {(arePolygonsOverlapping || arePolygonsContained) && (
+          <div>
+            <button
+              className="btn btn-outline-light w-100 mb-2"
+              onClick={() => {
+                const union = turf.union(turf.featureCollection(turfPolygons));
+                updatePolygonsArray(union);
+              }}
+            >
+              <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
+              Union
+            </button>
+
+            <button
+              className="btn btn-outline-light w-100 mb-2"
+              onClick={() => {
+                const intersection = turf.intersect(
+                  turf.featureCollection(turfPolygons)
+                );
+
+                updatePolygonsArray(intersection);
+              }}
+            >
+              <IntersectionAreaIcon
+                selectedPolygonIndexes={selectedPolygonIndexes}
+              />
+              Intersection
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 
