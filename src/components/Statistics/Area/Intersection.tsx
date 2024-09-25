@@ -1,9 +1,10 @@
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSolutionContext } from '../../../context/SolutionContext';
 import IntersectionAreaIcon from '../../icons/IntersectionAreaIcon';
+import { useStatisticsContext } from '../../../context/StatisticsContext';
 
-const IntersectionArea = (props: { intersectionArea: number }) => {
-  const { intersectionArea } = props;
+const IntersectionArea = () => {
+  const { intersectionArea } = useStatisticsContext();
   const { selectedPolygonIndexes } = useSolutionContext();
 
   if (isNaN(intersectionArea)) return null;

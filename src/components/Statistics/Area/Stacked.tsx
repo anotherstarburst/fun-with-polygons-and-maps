@@ -1,11 +1,11 @@
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSolutionContext } from '../../../context/SolutionContext';
 import StackedAreaIcon from '../../icons/StackedAreaIcon';
+import { useStatisticsContext } from '../../../context/StatisticsContext';
 
-const StackedArea = (props: { stackedArea: number }) => {
-  const { stackedArea } = props;
+const StackedArea = () => {
   const { selectedPolygonIndexes } = useSolutionContext();
-
+  const { stackedArea } = useStatisticsContext();
   if (selectedPolygonIndexes.length < 2) return null;
 
   return (

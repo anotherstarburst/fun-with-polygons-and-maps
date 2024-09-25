@@ -1,9 +1,10 @@
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSolutionContext } from '../../../context/SolutionContext';
 import UnionAreaIcon from '../../icons/UnionAreaIcon';
+import { useStatisticsContext } from '../../../context/StatisticsContext';
 
-const AreaUnion = (props: { unionArea: number }) => {
-  const { unionArea } = props;
+const AreaUnion = () => {
+  const { unionArea } = useStatisticsContext();
   const { selectedPolygonIndexes } = useSolutionContext();
 
   if (isNaN(unionArea)) return null;

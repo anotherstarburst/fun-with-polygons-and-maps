@@ -5,12 +5,7 @@ import StackedArea from './Stacked';
 import AreaUnion from './Union';
 import { useSolutionContext } from '../../../context/SolutionContext';
 
-function Area(props: {
-  stackedArea: number;
-  intersectionArea: number;
-  unionArea: number;
-}) {
-  const { stackedArea, intersectionArea, unionArea } = props;
+function Area() {
   const { selectedPolygonIndexes } = useSolutionContext();
 
   if (selectedPolygonIndexes.length < 1) return null;
@@ -28,9 +23,9 @@ function Area(props: {
           );
         })}
 
-        <StackedArea stackedArea={stackedArea} />
-        <AreaUnion unionArea={unionArea} />
-        <IntersectionArea intersectionArea={intersectionArea} />
+        <StackedArea />
+        <AreaUnion />
+        <IntersectionArea />
       </ul>
     </div>
   );
