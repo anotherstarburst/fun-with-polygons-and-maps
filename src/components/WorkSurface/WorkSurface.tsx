@@ -55,7 +55,7 @@ function WorkSurface() {
       >
         {paths.map((path, index) => (
           <Polygon
-            key={index}
+            key={`polygon-${index}`}
             paths={[path]}
             strokeColor={
               selectedPolygonIndexes.includes(index)

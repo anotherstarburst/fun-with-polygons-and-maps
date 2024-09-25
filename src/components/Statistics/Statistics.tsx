@@ -75,12 +75,13 @@ function Statistics() {
     return turf.area(intersection);
   }, [arePolygonsContained, arePolygonsOverlapping, turfPolygons]);
 
-  if (selectedPolygonIndexes.length < 1)
+  if (selectedPolygonIndexes.length < 1) {
     return (
       <div className="d-flex flex-column h-100 justify-content-center align-items-center">
         <p>Please select a polygon to start.</p>
       </div>
     );
+  }
 
   return (
     <div className="d-flex flex-column h-100 justify-content-between">

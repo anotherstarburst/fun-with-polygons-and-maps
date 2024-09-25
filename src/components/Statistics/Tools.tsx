@@ -42,7 +42,6 @@ function ToolsComponent(props: ToolsComponentProps) {
       (_, index) => !selectedPolygonIndexesClone.includes(index)
     );
 
-    // Function to add a single polygon feature
     const addPolygonFeature = (polygonGeometry: Polygon) => {
       updatedFeatures.push({
         type: 'Feature',
@@ -51,10 +50,9 @@ function ToolsComponent(props: ToolsComponentProps) {
       });
     };
 
-    // Handle Polygon or MultiPolygon
     if (newPolygon.geometry.type === 'Polygon') {
       addPolygonFeature(newPolygon.geometry);
-    } else {
+    } else if (newPolygon.geometry.type === 'MultiPolygon') {
       // MultiPolygon
       newPolygon.geometry.coordinates.forEach((polygonCoords) => {
         addPolygonFeature({
@@ -62,7 +60,18 @@ function ToolsComponent(props: ToolsComponentProps) {
           coordinates: polygonCoords,
         });
       });
+    } else {
+      throw new Error(
+        'Invalid geometry type: ' + JSON.stringify(newPolygon.geometry)
+      );
     }
+
+    // Sort the features to ensure no polygon fully contains another that precedes it
+    updatedFeatures.sort((a, b) => {
+      if (turf.booleanContains(a, b)) return -1;
+      if (turf.booleanContains(b, a)) return 1;
+      return 0;
+    });
 
     newSolutions[selectedSolutionIndex] = {
       ...newSolutions[selectedSolutionIndex],
