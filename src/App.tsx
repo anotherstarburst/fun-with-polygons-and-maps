@@ -1,6 +1,6 @@
 import { SolutionProvider } from './context/SolutionProvider';
 import Solutions from './components/Solutions';
-import Statistics from './components/Statistics';
+import Statistics from './components/Statistics/Statistics';
 import WorkSurface from './components/WorkSurface/WorkSurface';
 
 function App() {
