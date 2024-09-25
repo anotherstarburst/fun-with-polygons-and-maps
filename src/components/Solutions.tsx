@@ -18,7 +18,7 @@ const Solutions: React.FC = () => {
   };
 
   return (
-    <div className='d-flex flex-column h-100 justify-content-between'>
+    <div className="d-flex flex-column h-100 justify-content-between">
       <div>
         <p className="text-secondary fs-4 m-3">
           <FontAwesomeIcon icon={faLayerGroup} className="me-1" />
@@ -53,7 +53,11 @@ const Solutions: React.FC = () => {
           </li>
         </ul>
       </div>
-      <a className="text-center text-secondary fs-4 m-3" href="https://github.com/anotherstarburst/fun-with-polygons-and-maps" target='_blank'>
+      <a
+        className="text-center text-secondary fs-4 m-3"
+        href="https://github.com/anotherstarburst/fun-with-polygons-and-maps"
+        target="_blank"
+      >
         <FontAwesomeIcon icon={faGithub} />
       </a>
     </div>

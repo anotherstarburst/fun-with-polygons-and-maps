@@ -1,50 +1,68 @@
-# React + TypeScript + Vite
+# Fun with Polygons and Maps
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains a web application for performing operations on polygons plotted on a map.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Select two polygons and perform operations:
+  - Union: Combine the selected polygons into a single shape
+  - Intersect: Create a new polygon from the overlapping areas of the selected polygons
+- The resulting polygon from an operation replaces the selected polygons
+- Current state of polygons persists until page reload (no disk persistence required)
+- Switch between different proposed solutions while maintaining polygon states
+- Display the total area of selected polygons in the right panel
 
-## Expanding the ESLint configuration
+## Technology Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Frontend Framework: React
+- Build Tool: Vite
+- Deployment: GitHub Pages
+- Language: TypeScript
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+To run this project locally, you'll need Node.js (version 20) installed on your machine.
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/anotherstarburst/fun-with-polygons-and-maps.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd fun-with-polygons-and-maps/
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+## Running the Application
+
+Start the development server:
+
+```bash
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+This will launch the application at http://localhost:5173/fun-with-polygons-and-maps/
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Usage
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+1. Select two polygons on the map
+2. Choose an operation (union or intersect) from the control panel
+3. View the result of the operation, which replaces the selected polygons
+4. Switch between different proposed solutions using the provided controls
+5. Check the right panel to see the total area of selected polygons
+
+## Development
+
+This project uses React for the frontend, with TypeScript for type safety. Vite is used as the build tool for fast development and optimized production builds.
+
+## Deployment
+
+The application is set up for deployment to GitHub Pages using a CI/CD pipeline. Refer to the repository's GitHub Actions configuration for details on the deployment process.
+
+## Contributing
+
+If you have suggestions or improvements, please open an issue or submit a pull request.
+

@@ -9,7 +9,7 @@ interface SolutionProviderProps {
   children: ReactNode;
 }
 
-export function SolutionProvider({ children }: SolutionProviderProps) {
+export default function SolutionProvider({ children }: SolutionProviderProps) {
   const apiResponse = useMemo(() => {
     return [responseOne, responseTwo] as FeatureCollection[];
   }, []);

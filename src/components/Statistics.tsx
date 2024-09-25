@@ -3,10 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { polygonColorOptions } from './constants';
 import { Geometry } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faRuler,
-  faSquare,
-} from '@fortawesome/free-solid-svg-icons';
+import { faRuler, faSquare } from '@fortawesome/free-solid-svg-icons';
 
 import * as turf from '@turf/turf';
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
@@ -102,16 +99,13 @@ function Statistics() {
       </div>
     );
 
-
   const StackedAreaComponent = () => {
     if (selectedPolygonIndexes.length < 2) return null;
 
     return (
       <OverlayTrigger
         placement="auto"
-        overlay={<Tooltip >
-          Sum of the area of the selected polygons.
-        </Tooltip>}
+        overlay={<Tooltip>Sum of the area of the selected polygons.</Tooltip>}
       >
         <li>
           <span className="fa-li">
@@ -125,77 +119,75 @@ function Statistics() {
 
   const UnionAreaComponent = () => {
     if (isNaN(unionArea)) return null;
-    return (<OverlayTrigger
-      placement="auto"
-      overlay={<Tooltip >
-        Area of the union of the selected polygons.
-      </Tooltip>}
-    >
-      <li  >
-        <span className="fa-li">
-          <UnionAreaIcon
-            selectedPolygonIndexes={selectedPolygonIndexes}
-          />
-        </span>
-        {Math.floor(unionArea).toLocaleString()} m<sup>2</sup>
-      </li>
-    </OverlayTrigger>)
-  }
+    return (
+      <OverlayTrigger
+        placement="auto"
+        overlay={<Tooltip>Area of the union of the selected polygons.</Tooltip>}
+      >
+        <li>
+          <span className="fa-li">
+            <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
+          </span>
+          {Math.floor(unionArea).toLocaleString()} m<sup>2</sup>
+        </li>
+      </OverlayTrigger>
+    );
+  };
 
   const IntersectionAreaComponent = () => {
     if (isNaN(intersectionArea)) return null;
-    return (<OverlayTrigger
-      placement="auto"
-      overlay={<Tooltip >
-        Area of the intersection of the selected polygons.
-      </Tooltip>}
-    >
-      <li title="Intersection area">
-        <span className="fa-li">
-          <IntersectionAreaIcon
-            selectedPolygonIndexes={selectedPolygonIndexes}
-          />
-        </span>
-        {Math.floor(intersectionArea).toLocaleString()} m<sup>2</sup>
-      </li>
-    </OverlayTrigger>)
-  }
+    return (
+      <OverlayTrigger
+        placement="auto"
+        overlay={
+          <Tooltip>Area of the intersection of the selected polygons.</Tooltip>
+        }
+      >
+        <li title="Intersection area">
+          <span className="fa-li">
+            <IntersectionAreaIcon
+              selectedPolygonIndexes={selectedPolygonIndexes}
+            />
+          </span>
+          {Math.floor(intersectionArea).toLocaleString()} m<sup>2</sup>
+        </li>
+      </OverlayTrigger>
+    );
+  };
 
   const IndividualAreaComponent = (props: { polygonIndex: number }) => {
-    const {
-      polygonIndex,
+    const { polygonIndex } = props;
 
-    } = props;
-
-    return (<OverlayTrigger
-      placement="auto"
-      overlay={<Tooltip >
-        Area of the {polygonColorOptions[polygonIndex]} polygon
-      </Tooltip>}
-    >
-      <li
-
+    return (
+      <OverlayTrigger
+        placement="auto"
+        overlay={
+          <Tooltip>
+            Area of the {polygonColorOptions[polygonIndex]} polygon
+          </Tooltip>
+        }
       >
-        <span className="fa-li">
-          <FontAwesomeIcon
-            icon={faSquare}
-            style={{
-              color: polygonColorOptions[polygonIndex],
-            }}
-          />
-        </span>
-        <span
-          title={`${calculateArea(activeSolution.features[polygonIndex].geometry)}`}
-        >
-          {Math.floor(
-            calculateArea(activeSolution.features[polygonIndex].geometry)
-          ).toLocaleString()}{' '}
-          m<sup>2</sup>
-        </span>
-      </li></OverlayTrigger>
-    )
-
-  }
+        <li>
+          <span className="fa-li">
+            <FontAwesomeIcon
+              icon={faSquare}
+              style={{
+                color: polygonColorOptions[polygonIndex],
+              }}
+            />
+          </span>
+          <span
+            title={`${calculateArea(activeSolution.features[polygonIndex].geometry)}`}
+          >
+            {Math.floor(
+              calculateArea(activeSolution.features[polygonIndex].geometry)
+            ).toLocaleString()}{' '}
+            m<sup>2</sup>
+          </span>
+        </li>
+      </OverlayTrigger>
+    );
+  };
 
   return (
     <div className="d-flex flex-column h-100 justify-content-between">
@@ -210,16 +202,16 @@ function Statistics() {
           <ul className="fa-ul ms-4 text-end font-monospace">
             {selectedPolygonIndexes.map((value) => {
               return (
-                <IndividualAreaComponent polygonIndex={value} key={`${polygonColorOptions[value]}-polygon`} />
+                <IndividualAreaComponent
+                  polygonIndex={value}
+                  key={`${polygonColorOptions[value]}-polygon`}
+                />
               );
             })}
-
 
             <StackedAreaComponent />
             <UnionAreaComponent />
             <IntersectionAreaComponent />
-
-
           </ul>
         </div>
       )}

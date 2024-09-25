@@ -1,4 +1,4 @@
-import { SolutionProvider } from './SolutionProvider';
+import SolutionProvider from './SolutionProvider';
 import Solutions from './components/Solutions';
 import Statistics from './components/Statistics';
 import WorkSurface from './components/WorkSurface';
