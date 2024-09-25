@@ -104,12 +104,7 @@ function Statistics() {
             <button
               className="btn btn-outline-light w-100 mb-2"
               onClick={() => {
-                // This will calculate the union of the selected polygons. It will then
-                // replace the polygons that were united, with the union.
-                // setSolutions will be used to update the solutions. Note selectedSolutionIndex corresponds
-                // to the activeSolution within the solutions array.
                 const union = turf.union(turf.featureCollection(turfPolygons));
-
                 updatePolygonsArray(union);
               }}
             >
@@ -119,7 +114,6 @@ function Statistics() {
             <button
               className="btn btn-outline-light w-100"
               onClick={() => {
-                console.log({ turfPolygons });
                 const intersection = turf.intersect(
                   turf.featureCollection(turfPolygons)
                 );
@@ -211,20 +205,12 @@ function Statistics() {
   function updatePolygonsArray(
     newPolygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | null
   ) {
-    // We need to reset the selected polygons to an empty array before we update
-    // the polygons array otherwise a race condition will occur as solutions
-    // updates, triggering hooks, before the selected polygons array is updated.
     const selectedPolygonIndexesClone = [...selectedPolygonIndexes];
     setSelectedPolygonIndexes([]);
 
     setSolutions((prevSolutions) => {
       if (!newPolygon) {
         console.error('No polygon');
-        return prevSolutions;
-      }
-
-      if (newPolygon.geometry.type !== 'Polygon') {
-        console.log("Not a polygon, it's a: " + newPolygon.geometry.type);
         return prevSolutions;
       }
 
@@ -236,12 +222,26 @@ function Statistics() {
         (_, index) => !selectedPolygonIndexesClone.includes(index)
       );
 
-      // Add the union polygon
-      updatedFeatures.push({
-        type: 'Feature',
-        properties: {},
-        geometry: newPolygon.geometry,
-      });
+      // Function to add a single polygon feature
+      const addPolygonFeature = (polygonGeometry: Polygon) => {
+        updatedFeatures.push({
+          type: 'Feature',
+          properties: {},
+          geometry: polygonGeometry,
+        });
+      };
+
+      // Handle Polygon or MultiPolygon
+      if (newPolygon.geometry.type === 'Polygon') {
+        addPolygonFeature(newPolygon.geometry);
+      } else { // MultiPolygon
+        newPolygon.geometry.coordinates.forEach((polygonCoords) => {
+          addPolygonFeature({
+            type: 'Polygon',
+            coordinates: polygonCoords
+          });
+        });
+      }
 
       newSolutions[selectedSolutionIndex] = {
         ...newSolutions[selectedSolutionIndex],
