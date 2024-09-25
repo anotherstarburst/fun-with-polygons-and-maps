@@ -4,7 +4,6 @@ import { polygonColorOptions } from './constants';
 import { Geometry } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faPizzaSlice,
   faRuler,
   faSquare,
   faToolbox,
@@ -57,32 +56,44 @@ function Statistics() {
     // Impossible to have overlapping polygons if there is only one polygon
     if (turfPolygons.length < 2) return false;
 
+    // returns true if the two geometries overlap, provided that neither completely contains the other.
     return turf.booleanOverlap(turfPolygons[0], turfPolygons[1]);
+  }, [turfPolygons]);
+
+  const arePolygonsContained = useMemo(() => {
+    // Impossible to have overlapping polygons if there is only one polygon
+    if (turfPolygons.length < 2) return false;
+
+    // returns true if either geometry completely contains the other.
+    return (
+      turf.booleanContains(turfPolygons[0], turfPolygons[1]) ||
+      turf.booleanContains(turfPolygons[1], turfPolygons[0])
+    );
   }, [turfPolygons]);
 
   const unionArea = useMemo(() => {
     // Only calculated if there are two or more selected polygons and all overlap
-    // otherwise we'll get MultiPolygons for union and we can't calculate the area
-    if (!arePolygonsOverlapping) return NaN;
+    // or are contained
+    if (!arePolygonsOverlapping && !arePolygonsContained) return NaN;
 
     const union = turf.union(turf.featureCollection(turfPolygons));
 
     if (!union) return NaN;
 
     return turf.area(union);
-  }, [arePolygonsOverlapping, turfPolygons]);
+  }, [arePolygonsContained, arePolygonsOverlapping, turfPolygons]);
 
   const intersectionArea = useMemo(() => {
     // Only calculated if there are two or more selected polygons and all overlap
-    // otherwise we'll get MultiPolygons for intersection and we can't calculate the area
-    if (!arePolygonsOverlapping) return NaN;
+    // or are contained
+    if (!arePolygonsOverlapping && !arePolygonsContained) return NaN;
 
     const intersection = turf.intersect(turf.featureCollection(turfPolygons));
 
     if (!intersection) return NaN;
 
     return turf.area(intersection);
-  }, [arePolygonsOverlapping, turfPolygons]);
+  }, [arePolygonsContained, arePolygonsOverlapping, turfPolygons]);
 
   if (selectedPolygonIndexes.length < 1)
     return (
@@ -95,12 +106,13 @@ function Statistics() {
     // space between the two containers
     <div className="d-flex flex-column h-100 justify-content-between">
       <div>
-        {arePolygonsOverlapping && (
+        {(arePolygonsOverlapping || arePolygonsContained) && (
           <div>
             <p className="text-secondary fs-4 mt-3">
               <FontAwesomeIcon icon={faToolbox} className="me-1" />
               Tools
             </p>
+
             <button
               className="btn btn-outline-light w-100 mb-2"
               onClick={() => {
@@ -111,6 +123,7 @@ function Statistics() {
               <UnionAreaIcon selectedPolygonIndexes={selectedPolygonIndexes} />
               Union
             </button>
+
             <button
               className="btn btn-outline-light w-100"
               onClick={() => {
@@ -234,11 +247,12 @@ function Statistics() {
       // Handle Polygon or MultiPolygon
       if (newPolygon.geometry.type === 'Polygon') {
         addPolygonFeature(newPolygon.geometry);
-      } else { // MultiPolygon
+      } else {
+        // MultiPolygon
         newPolygon.geometry.coordinates.forEach((polygonCoords) => {
           addPolygonFeature({
             type: 'Polygon',
-            coordinates: polygonCoords
+            coordinates: polygonCoords,
           });
         });
       }
