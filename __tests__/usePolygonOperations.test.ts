@@ -3,6 +3,7 @@ import { usePolygonOperations } from '../src/hooks/usePolygonOperations';
 import { useSolutionContext } from '../src/context/SolutionContext';
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
 import { FeatureCollection } from '../src/types';
+import * as turf from '@turf/turf';
 
 jest.mock('../src/context/SolutionContext', () => ({
   useSolutionContext: jest.fn(),
@@ -25,7 +26,10 @@ describe('usePolygonOperations', () => {
   });
 
   it('should update solutions with a new Polygon', () => {
-    const newPolygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> = {
+    const constructedPolygon: Feature<
+      Polygon | MultiPolygon,
+      GeoJsonProperties
+    > = {
       type: 'Feature',
       geometry: {
         type: 'Polygon',
@@ -80,7 +84,7 @@ describe('usePolygonOperations', () => {
     const { result } = renderHook(() => usePolygonOperations());
 
     act(() => {
-      result.current.updatePolygonsArray(newPolygon, initialSolutions);
+      result.current.updatePolygonsArray(constructedPolygon, initialSolutions);
     });
 
     // The new polygon should be added to the solutions. Those listed in initialSolutions
@@ -228,8 +232,101 @@ describe('usePolygonOperations', () => {
     ).toThrow('Invalid geometry type');
   });
 
-  // it('should sort features based on polygon containment', () => {
-  //     //  TODO
-  //     expect(true).toBe(false);
-  // });
+  it('should sort features based on polygon containment', () => {
+    const { result } = renderHook(() => usePolygonOperations());
+    const initialSolutions: FeatureCollection[] = [
+      {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [2, 2],
+                  [3, 3],
+                  [3, 2],
+                  [2, 2],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [5, 6],
+                  [7, 8],
+                  [10, 15],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [10, 20],
+                  [10, 30],
+                  [10, 35],
+                ],
+              ],
+            },
+            properties: {},
+          },
+        ],
+      },
+    ];
+
+    const constructedPolygon: Feature<
+      Polygon | MultiPolygon,
+      GeoJsonProperties
+    > = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [0, 0],
+            [1, 1],
+            [1, 0],
+            [0, 0],
+          ],
+        ],
+      },
+      properties: {},
+    };
+
+    // Mock the booleanContains function to simulate containment
+    (turf.booleanContains as jest.Mock).mockImplementation((a, b) => {
+      // The last polygon in initialSolutions contains the newly constructed polygon
+      return a === initialSolutions[0].features[2] && b === constructedPolygon;
+    });
+
+    act(() => {
+      result.current.updatePolygonsArray(constructedPolygon, initialSolutions);
+    });
+
+    expect(mockSetSolutions).toHaveBeenCalled();
+    const updatedSolutions = mockSetSolutions.mock.calls[0][0];
+
+    // The last polygon in the solutions array overlaps with the new polygon,
+    // so we should put that first, and the new polygon should be added to the end of the array
+    // to ensure they're written to the map, one on top of the other
+    expect(updatedSolutions[0].features[0]).toEqual(
+      initialSolutions[0].features[2]
+    );
+
+    // The constructed polygon should be added after the remaining polygon in the solutions array
+    // as it overlaps with the new polygon.
+    // This is to ensure they're written to the map, one on top of the other.
+    expect(updatedSolutions[0].features[1]).toEqual(constructedPolygon);
+  });
 });
