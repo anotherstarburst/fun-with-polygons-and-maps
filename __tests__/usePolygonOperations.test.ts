@@ -1,44 +1,126 @@
+import { renderHook, act } from '@testing-library/react';
+import { usePolygonOperations } from '../src/hooks/usePolygonOperations';
 import { useSolutionContext } from '../src/context/SolutionContext';
+import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
+import { FeatureCollection } from '../src/types';
 
-// Mock the useSolutionContext hook
 jest.mock('../src/context/SolutionContext', () => ({
-    useSolutionContext: jest.fn(),
+  useSolutionContext: jest.fn(),
 }));
 
-// Mock turf functions
 jest.mock('@turf/turf', () => ({
-    booleanContains: jest.fn(),
+  booleanContains: jest.fn(),
 }));
 
 describe('usePolygonOperations', () => {
-    let mockSetSolutions: jest.Mock;
+  let mockSetSolutions: jest.Mock;
 
-    beforeEach(() => {
-        mockSetSolutions = jest.fn();
-        (useSolutionContext as jest.Mock).mockReturnValue({
-            selectedPolygonIndexes: [0, 1],
-            selectedSolutionIndex: 0,
-            setSolutions: mockSetSolutions,
-        });
+  beforeEach(() => {
+    mockSetSolutions = jest.fn();
+    (useSolutionContext as jest.Mock).mockReturnValue({
+      selectedPolygonIndexes: [0, 1],
+      selectedSolutionIndex: 0,
+      setSolutions: mockSetSolutions,
+    });
+  });
+
+  it('should update solutions with a new Polygon', () => {
+    const newPolygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [0, 0],
+            [1, 1],
+            [1, 0],
+            [0, 0],
+          ],
+        ],
+      },
+      properties: {},
+    };
+
+    const initialSolutions: FeatureCollection[] = [
+      {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [2, 2],
+                  [3, 3],
+                  [3, 2],
+                  [2, 2],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [5, 6],
+                  [7, 8],
+                ],
+              ],
+            },
+            properties: {},
+          },
+        ],
+      },
+    ];
+
+    const { result } = renderHook(() => usePolygonOperations());
+
+    act(() => {
+      result.current.updatePolygonsArray(newPolygon, initialSolutions);
     });
 
-    it('should update solutions with a new Polygon', () => {
-        // TODO
-        expect(true).toBe(false);
-    });
+    // The new polygon should be added to the solutions. Those listed in initialSolutions
+    // should be removed from the solutions as they're present as indexes in selectedPolygonIndexes.
+    expect(mockSetSolutions).toHaveBeenCalledWith([
+      {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [0, 0],
+                  [1, 1],
+                  [1, 0],
+                  [0, 0],
+                ],
+              ],
+            },
+          },
+        ],
+      },
+    ]);
+  });
 
-    it('should update solutions with a new MultiPolygon', () => {
-        // TODO
-        expect(true).toBe(false);
-    });
+  // it('should update solutions with a new MultiPolygon', () => {
+  //     // TODO
+  //     expect(true).toBe(false);
+  // });
 
-    it('should throw an error for invalid geometry type', () => {
-        // TODO
-        expect(true).toBe(false);
-    });
+  // it('should throw an error for invalid geometry type', () => {
+  //     // TODO
+  //     expect(true).toBe(false);
+  // });
 
-    it('should sort features based on polygon containment', () => {
-        //  TODO
-        expect(true).toBe(false);
-    });
+  // it('should sort features based on polygon containment', () => {
+  //     //  TODO
+  //     expect(true).toBe(false);
+  // });
 });
