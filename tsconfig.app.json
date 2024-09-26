@@ -6,6 +6,9 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
+    /* Module system - for jest */
+    "esModuleInterop": true,
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
