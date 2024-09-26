@@ -21,9 +21,9 @@ This repository contains a web application for performing operations on polygons
 
 ## Tests
 
-Any geospatial calculations, or the operations on the geospatial polygons is handled by the [@turf/turf](https://www.npmjs.com/package/@turf/turf) or [@vis.gl/react-google-maps](https://www.npmjs.com/package/@vis.gl/react-google-maps) packages, thus we'd be testing those libraries. While that might be sensible for a production grade application - it's outside of the remit of this exercise so we can hand off the work to the package maintainers.
+The only tests present are for the usePolygonOperations hook, to ensure that the polygons are added / and edited as expected. Those live in the [__tests__](/__tests__/) folder.
 
-The only tests present are for the usePolygonOperations hook, to ensure that the polygons are added / and edited as expected.
+Any geospatial calculations, or the operations on the geospatial polygons is handled by the [@turf/turf](https://www.npmjs.com/package/@turf/turf) or [@vis.gl/react-google-maps](https://www.npmjs.com/package/@vis.gl/react-google-maps) packages. We could test those libraries but it's outside of the remit of this exercise so we can hand off the work to the package maintainers. It might be sensible for a production grade application.
 
 ## Documentation
 
