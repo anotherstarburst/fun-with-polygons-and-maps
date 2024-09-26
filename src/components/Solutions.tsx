@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSolutionContext } from '../context/SolutionContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLayerGroup } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +8,7 @@ interface SolutionItemProps {
   index: number;
 }
 
-const SolutionItem: React.FC<SolutionItemProps> = (props) => {
+const SolutionItem = (props: SolutionItemProps) => {
   const { selectedSolutionIndex, setSelectedSolutionIndex } =
     useSolutionContext();
   const { label, index } = props;
@@ -31,7 +30,7 @@ const SolutionItem: React.FC<SolutionItemProps> = (props) => {
   );
 };
 
-const Solutions: React.FC = () => {
+const Solutions = () => {
   const { solutions } = useSolutionContext();
 
   return (
