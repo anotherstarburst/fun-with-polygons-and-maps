@@ -1,7 +1,13 @@
 import { renderHook, act } from '@testing-library/react';
 import { usePolygonOperations } from '../src/hooks/usePolygonOperations';
 import { useSolutionContext } from '../src/context/SolutionContext';
-import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
+import {
+  Feature,
+  Polygon,
+  MultiPolygon,
+  GeoJsonProperties,
+  Position,
+} from 'geojson';
 import { FeatureCollection } from '../src/types';
 import * as turf from '@turf/turf';
 
@@ -12,6 +18,69 @@ jest.mock('../src/context/SolutionContext', () => ({
 jest.mock('@turf/turf', () => ({
   booleanContains: jest.fn(),
 }));
+
+const createPolygon = (
+  coordinates: number[][]
+): Feature<Polygon, Record<string, unknown>> => ({
+  type: 'Feature',
+  geometry: {
+    type: 'Polygon',
+    coordinates: [coordinates],
+  },
+  properties: {},
+});
+
+const createMultiPolygon = (
+  coordinates: Position[][][]
+): Feature<MultiPolygon, Record<string, unknown>> => ({
+  type: 'Feature',
+  geometry: {
+    type: 'MultiPolygon',
+    coordinates,
+  },
+  properties: {},
+});
+
+const mockInitialSolutionsTwoPolygons: FeatureCollection[] = [
+  {
+    type: 'FeatureCollection',
+    features: [
+      createPolygon([
+        [2, 2],
+        [3, 3],
+        [3, 2],
+        [2, 2],
+      ]),
+      createPolygon([
+        [5, 6],
+        [7, 8],
+      ]),
+    ],
+  },
+];
+
+const mockInitialSolutionsThreePolygons: FeatureCollection[] = [
+  {
+    type: 'FeatureCollection',
+    features: [
+      createPolygon([
+        [2, 2],
+        [3, 3],
+        [3, 2],
+        [2, 2],
+      ]),
+      createPolygon([
+        [5, 6],
+        [7, 8],
+      ]),
+      createPolygon([
+        [10, 20],
+        [10, 30],
+        [10, 35],
+      ]),
+    ],
+  },
+];
 
 describe('usePolygonOperations', () => {
   let mockSetSolutions: jest.Mock;
@@ -26,65 +95,20 @@ describe('usePolygonOperations', () => {
   });
 
   it('should update solutions with a new Polygon', () => {
-    const constructedPolygon: Feature<
-      Polygon | MultiPolygon,
-      GeoJsonProperties
-    > = {
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [0, 0],
-            [1, 1],
-            [1, 0],
-            [0, 0],
-          ],
-        ],
-      },
-      properties: {},
-    };
-
-    const initialSolutions: FeatureCollection[] = [
-      {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [2, 2],
-                  [3, 3],
-                  [3, 2],
-                  [2, 2],
-                ],
-              ],
-            },
-            properties: {},
-          },
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [5, 6],
-                  [7, 8],
-                ],
-              ],
-            },
-            properties: {},
-          },
-        ],
-      },
-    ];
+    const constructedPolygon = createPolygon([
+      [0, 0],
+      [1, 1],
+      [1, 0],
+      [0, 0],
+    ]);
 
     const { result } = renderHook(() => usePolygonOperations());
 
     act(() => {
-      result.current.updatePolygonsArray(constructedPolygon, initialSolutions);
+      result.current.updatePolygonsArray(
+        constructedPolygon,
+        mockInitialSolutionsTwoPolygons
+      );
     });
 
     // The new polygon should be added to the solutions. Those listed in initialSolutions
@@ -92,90 +116,35 @@ describe('usePolygonOperations', () => {
     expect(mockSetSolutions).toHaveBeenCalledWith([
       {
         type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [0, 0],
-                  [1, 1],
-                  [1, 0],
-                  [0, 0],
-                ],
-              ],
-            },
-          },
-        ],
+        features: [constructedPolygon],
       },
     ]);
   });
 
   it('should update solutions with a new MultiPolygon', () => {
     const { result } = renderHook(() => usePolygonOperations());
-    const initialSolutions: FeatureCollection[] = [
-      {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [2, 2],
-                  [3, 3],
-                  [3, 2],
-                  [2, 2],
-                ],
-              ],
-            },
-            properties: {},
-          },
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [5, 6],
-                  [7, 8],
-                ],
-              ],
-            },
-            properties: {},
-          },
-        ],
-      },
-    ];
 
-    const newMultiPolygon: Feature<MultiPolygon, GeoJsonProperties> = {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'MultiPolygon',
-        coordinates: [
-          [
-            [
-              [0, 1],
-              [2, 3],
-              [4, 5],
-            ],
-          ],
-          [
-            [
-              [0, 1],
-              [2, 3],
-            ],
-          ],
+    const constructedMultiPolygon = createMultiPolygon([
+      [
+        [
+          [0, 1],
+          [2, 3],
+          [4, 5],
         ],
-      },
-    };
+      ],
+      [
+        [
+          [0, 1],
+          [2, 3],
+        ],
+      ],
+    ]);
 
     act(() => {
-      result.current.updatePolygonsArray(newMultiPolygon, initialSolutions);
+      result.current.updatePolygonsArray(
+        constructedMultiPolygon,
+        mockInitialSolutionsTwoPolygons
+      );
     });
 
     // Again, the setSolutions will remove the existing initialSolutions (as both have been "selected") and instead
@@ -184,33 +153,15 @@ describe('usePolygonOperations', () => {
       {
         type: 'FeatureCollection',
         features: [
-          {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [0, 1],
-                  [2, 3],
-                  [4, 5],
-                ],
-              ],
-            },
-          },
-          {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [0, 1],
-                  [2, 3],
-                ],
-              ],
-            },
-          },
+          createPolygon([
+            [0, 1],
+            [2, 3],
+            [4, 5],
+          ]),
+          createPolygon([
+            [0, 1],
+            [2, 3],
+          ]),
         ],
       },
     ]);
@@ -234,84 +185,28 @@ describe('usePolygonOperations', () => {
 
   it('should sort features based on polygon containment', () => {
     const { result } = renderHook(() => usePolygonOperations());
-    const initialSolutions: FeatureCollection[] = [
-      {
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [2, 2],
-                  [3, 3],
-                  [3, 2],
-                  [2, 2],
-                ],
-              ],
-            },
-            properties: {},
-          },
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [5, 6],
-                  [7, 8],
-                  [10, 15],
-                ],
-              ],
-            },
-            properties: {},
-          },
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [10, 20],
-                  [10, 30],
-                  [10, 35],
-                ],
-              ],
-            },
-            properties: {},
-          },
-        ],
-      },
-    ];
 
-    const constructedPolygon: Feature<
-      Polygon | MultiPolygon,
-      GeoJsonProperties
-    > = {
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [0, 0],
-            [1, 1],
-            [1, 0],
-            [0, 0],
-          ],
-        ],
-      },
-      properties: {},
-    };
+    const constructedPolygon = createPolygon([
+      [0, 0],
+      [1, 1],
+      [1, 0],
+      [0, 0],
+    ]);
 
     // Mock the booleanContains function to simulate containment
     (turf.booleanContains as jest.Mock).mockImplementation((a, b) => {
       // The last polygon in initialSolutions contains the newly constructed polygon
-      return a === initialSolutions[0].features[2] && b === constructedPolygon;
+      return (
+        a === mockInitialSolutionsThreePolygons[0].features[2] &&
+        b === constructedPolygon
+      );
     });
 
     act(() => {
-      result.current.updatePolygonsArray(constructedPolygon, initialSolutions);
+      result.current.updatePolygonsArray(
+        constructedPolygon,
+        mockInitialSolutionsThreePolygons
+      );
     });
 
     expect(mockSetSolutions).toHaveBeenCalled();
@@ -321,7 +216,7 @@ describe('usePolygonOperations', () => {
     // so we should put that first, and the new polygon should be added to the end of the array
     // to ensure they're written to the map, one on top of the other
     expect(updatedSolutions[0].features[0]).toEqual(
-      initialSolutions[0].features[2]
+      mockInitialSolutionsThreePolygons[0].features[2]
     );
 
     // The constructed polygon should be added after the remaining polygon in the solutions array
