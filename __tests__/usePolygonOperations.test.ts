@@ -109,10 +109,108 @@ describe('usePolygonOperations', () => {
     ]);
   });
 
-  // it('should update solutions with a new MultiPolygon', () => {
-  //     // TODO
-  //     expect(true).toBe(false);
-  // });
+  it('should update solutions with a new MultiPolygon', () => {
+    const { result } = renderHook(() => usePolygonOperations());
+    const initialSolutions: FeatureCollection[] = [
+      {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [2, 2],
+                  [3, 3],
+                  [3, 2],
+                  [2, 2],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [5, 6],
+                  [7, 8],
+                ],
+              ],
+            },
+            properties: {},
+          },
+        ],
+      },
+    ];
+
+    const newMultiPolygon: Feature<MultiPolygon, GeoJsonProperties> = {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: [
+          [
+            [
+              [0, 1],
+              [2, 3],
+              [4, 5],
+            ],
+          ],
+          [
+            [
+              [0, 1],
+              [2, 3],
+            ],
+          ],
+        ],
+      },
+    };
+
+    act(() => {
+      result.current.updatePolygonsArray(newMultiPolygon, initialSolutions);
+    });
+
+    // Again, the setSolutions will remove the existing initialSolutions (as both have been "selected") and instead
+    // insert the two polygons split from the multipolygon.
+    expect(mockSetSolutions).toHaveBeenCalledWith([
+      {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [0, 1],
+                  [2, 3],
+                  [4, 5],
+                ],
+              ],
+            },
+          },
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [0, 1],
+                  [2, 3],
+                ],
+              ],
+            },
+          },
+        ],
+      },
+    ]);
+  });
 
   // it('should throw an error for invalid geometry type', () => {
   //     // TODO
