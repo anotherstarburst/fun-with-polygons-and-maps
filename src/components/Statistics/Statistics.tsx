@@ -1,7 +1,7 @@
 import { useSolutionContext } from '../../context/SolutionContext';
 
 import Area from './Area/Area';
-import Tools from './Tools';
+import Tools from './Tools/Tools';
 
 function Statistics() {
   const { selectedPolygonIndexes } = useSolutionContext();
