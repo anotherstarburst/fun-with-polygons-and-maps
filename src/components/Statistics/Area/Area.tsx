@@ -11,23 +11,21 @@ function Area() {
   if (selectedPolygonIndexes.length < 1) return null;
 
   return (
-    <div className="mt-3">
+    <ul className="fa-ul ms-4 text-end font-monospace">
       {/* Right aligned, and monospaced so that it's easier to compare the numbers (spreadsheet style) */}
-      <ul className="fa-ul ms-4 text-end font-monospace">
-        {selectedPolygonIndexes.map((value) => {
-          return (
-            <IndividualArea
-              polygonIndex={value}
-              key={`${polygonColorOptions[value]}-polygon`}
-            />
-          );
-        })}
+      {selectedPolygonIndexes.map((value) => {
+        return (
+          <IndividualArea
+            polygonIndex={value}
+            key={`${polygonColorOptions[value]}-polygon`}
+          />
+        );
+      })}
 
-        <StackedArea />
-        <UnionArea />
-        <IntersectionArea />
-      </ul>
-    </div>
+      <StackedArea />
+      <UnionArea />
+      <IntersectionArea />
+    </ul>
   );
 }
 

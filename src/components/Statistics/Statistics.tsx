@@ -1,4 +1,5 @@
 import { useSolutionContext } from '../../context/SolutionContext';
+import { StatisticsProvider } from '../../context/StatisticsContext';
 
 import Area from './Area/Area';
 import Tools from './Tools/Tools';
@@ -15,11 +16,16 @@ function Statistics() {
   }
 
   return (
-    <div className="d-flex flex-column h-100 justify-content-between">
-      <Area />
-
-      <Tools />
-    </div>
+    <StatisticsProvider>
+      <div className="d-flex flex-column h-100 justify-content-between">
+        <div className="mt-3">
+          <Area />
+        </div>
+        <div>
+          <Tools />
+        </div>
+      </div>
+    </StatisticsProvider>
   );
 }
 
