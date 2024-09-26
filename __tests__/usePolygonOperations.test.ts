@@ -212,10 +212,21 @@ describe('usePolygonOperations', () => {
     ]);
   });
 
-  // it('should throw an error for invalid geometry type', () => {
-  //     // TODO
-  //     expect(true).toBe(false);
-  // });
+  it('should throw an error for invalid geometry type', () => {
+    const { result } = renderHook(() => usePolygonOperations());
+    const initialSolutions: FeatureCollection[] = [
+      { type: 'FeatureCollection', features: [] },
+    ];
+    const invalidPolygon = {
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'InvalidType', coordinates: [[]] },
+    } as unknown as Feature<Polygon | MultiPolygon, GeoJsonProperties>;
+
+    expect(() =>
+      result.current.updatePolygonsArray(invalidPolygon, initialSolutions)
+    ).toThrow('Invalid geometry type');
+  });
 
   // it('should sort features based on polygon containment', () => {
   //     //  TODO

@@ -43,9 +43,7 @@ export const usePolygonOperations = () => {
           });
         });
       } else {
-        throw new Error(
-          'Invalid geometry type: ' + JSON.stringify(newPolygon.geometry)
-        );
+        throw new Error('Invalid geometry type');
       }
 
       // Sort the features to ensure no polygon fully contains another that precedes it
