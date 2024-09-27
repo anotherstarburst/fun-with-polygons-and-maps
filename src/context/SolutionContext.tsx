@@ -2,8 +2,8 @@ import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 import { FeatureCollection } from '../types';
 import { ReactNode, useMemo, useState, useEffect, useCallback } from 'react';
 
-import responseOne from '../data/SE_State_Management_Polygons_1.json';
-import responseTwo from '../data/SE_State_Management_Polygons_2.json';
+import responseOne from '../data/solution-1.json';
+import responseTwo from '../data/solution-2.json';
 
 interface SolutionContextType {
   selectedPolygonIndexes: number[];
