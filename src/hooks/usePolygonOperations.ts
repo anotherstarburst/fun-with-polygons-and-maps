@@ -1,7 +1,12 @@
 import { useCallback } from 'react';
-import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
+import {
+  FeatureCollection,
+  Feature,
+  Polygon,
+  MultiPolygon,
+  GeoJsonProperties,
+} from 'geojson';
 import * as turf from '@turf/turf';
-import { FeatureCollection } from '../types';
 import { useSolutionContext } from '../context/SolutionContext';
 
 export const usePolygonOperations = () => {

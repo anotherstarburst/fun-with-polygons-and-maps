@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
-import { FeatureCollection } from '../types';
 import { ReactNode, useMemo, useState, useEffect, useCallback } from 'react';
+import { FeatureCollection } from 'geojson';
 
 import responseOne from '../data/solution-1.json';
 import responseTwo from '../data/solution-2.json';

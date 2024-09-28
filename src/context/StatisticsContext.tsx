@@ -48,7 +48,13 @@ export const StatisticsProvider = ({ children }: StatisticsProviderProps) => {
       throw new Error('Too many polygons selected');
     const polygons = [];
     for (const polygonIndex of selectedPolygonIndexes) {
-      const { coordinates } = activeSolution.features[polygonIndex].geometry;
+      const polygon = activeSolution.features[polygonIndex].geometry;
+
+      if (!polygon || polygon.type !== 'Polygon') {
+        throw new Error('Invalid polygon');
+      }
+
+      const { coordinates } = polygon;
       polygons.push(turf.polygon(coordinates));
     }
     return polygons;

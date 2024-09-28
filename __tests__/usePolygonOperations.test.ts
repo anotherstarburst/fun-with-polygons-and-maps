@@ -2,13 +2,14 @@ import { renderHook, act } from '@testing-library/react';
 import { usePolygonOperations } from '../src/hooks/usePolygonOperations';
 import { useSolutionContext } from '../src/context/SolutionContext';
 import {
+  FeatureCollection,
   Feature,
   Polygon,
   MultiPolygon,
   GeoJsonProperties,
   Position,
 } from 'geojson';
-import { FeatureCollection } from '../src/types';
+
 import * as turf from '@turf/turf';
 
 jest.mock('../src/context/SolutionContext', () => ({

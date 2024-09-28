@@ -2,7 +2,7 @@ import { Polygon } from './Polygon';
 import { useSolutionContext } from '../../context/SolutionContext';
 
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
-import { FeatureCollection } from '../../types';
+import { FeatureCollection } from 'geojson';
 import { useMemo } from 'react';
 import { polygonColorOptions } from '../constants';
 import { MAX_SELECTED_POLYGONS } from '../constants';
@@ -12,6 +12,10 @@ const SELECTED_POLYGON_COLOUR = '#fff';
 
 function getPolygons(activeSolution: FeatureCollection) {
   return activeSolution.features.map((feature) => {
+    if (feature.geometry.type !== 'Polygon') {
+      throw new Error('WorkSurface: activeSolution feature is not a polygon');
+    }
+
     return feature.geometry.coordinates[0].map((coord) => ({
       lat: coord[1],
       lng: coord[0],
@@ -28,10 +32,16 @@ function WorkSurface() {
   const defaultCenter = useMemo(() => {
     const points: number[][] = [];
     activeSolution.features.forEach((feature) => {
+      if (feature.geometry.type !== 'Polygon') {
+        throw new Error('WorkSurface: activeSolution is not a polygon');
+      }
+
       feature.geometry.coordinates[0].forEach((coord) => {
         points.push([coord[0], coord[1]]);
       });
     });
+
+    if (paths === undefined || paths[0] === undefined) return;
 
     if (!points || !points.length) return paths[0][0];
 
